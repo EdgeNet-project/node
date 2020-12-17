@@ -3,35 +3,44 @@
 set -eu
 export DEBIAN_FRONTEND=noninteractive
 
-# TODO: Detect sudo and don't use it if not present.
+# For debugging/development, set this to "file://." or another local directory.
+EDGENET_REPOSITORY="${EDGENET_REPOSITORY:-https://github.com/EdgeNet-project/edgenet.git}"
+EDGENET_PLAYBOOK="${EDGENET_PLAYBOOK:-edgenet-node-full.yml}"
 
+# Some systems do not have sudo, in this case do not use it.
+SUDO="sudo"
+if ! command -v "${SUDO}" >/dev/null 2>&1; then
+    SUDO=""
+fi
+
+# Fetch the OS identifier.
 ID="unknown"
 . /etc/os-release
 
 case ${ID} in
     centos)
-        sudo yum install --assumeyes epel-release
-        sudo yum install --assumeyes ansible git
+        ${SUDO} yum install --assumeyes epel-release
+        ${SUDO} yum install --assumeyes ansible git python3-pip
         ;;
 
     fedora)
-        sudo dnf install --assumeyes ansible git
+        ${SUDO} dnf install --assumeyes ansible git python3-pip
         ;;
 
     debian)
-        sudo apt update
-        sudo apt install --yes dirmngr software-properties-common
-        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
-        sudo apt-add-repository --update --yes \
+        ${SUDO} apt update
+        ${SUDO} apt install --yes dirmngr software-properties-common
+        ${SUDO} apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
+        ${SUDO} apt-add-repository --update --yes \
             "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main"
-        sudo apt install --yes ansible git
+        ${SUDO} apt install --yes ansible git python3-pip
         ;;
 
     ubuntu)
-        sudo apt update
-        sudo apt install --yes dirmngr software-properties-common
-        sudo apt-add-repository --yes --update ppa:ansible/ansible
-        sudo apt install --yes ansible git
+        ${SUDO} apt update
+        ${SUDO} apt install --yes dirmngr software-properties-common
+        ${SUDO} apt-add-repository --yes --update ppa:ansible/ansible
+        ${SUDO} apt install --yes ansible git python3-pip
         ;;
 
     *)
@@ -40,4 +49,16 @@ case ${ID} in
         ;;
 esac
 
-ansible-playbook -c local -i localhost, /node/node.yml
+# Fetch the repository.
+TMP=$(mktemp -d)
+git clone --depth 1 "${EDGENET_REPOSITORY}" "${TMP}"
+
+# Install collections and roles from Ansible Galaxy.
+ansible-galaxy collection install --ignore-errors --requirements-file "${TMP}/requirements.yml"
+ansible-galaxy role install --ignore-errors --role-file "${TMP}/requirements.yml"
+
+# Run the node playbook.
+ansible-playbook --connection local \
+                 --extra-vars "ansible_python_interpreter=/usr/bin/python3" \
+                 --inventory "localhost," \
+                 "${TMP}/${EDGENET_PLAYBOOK}"

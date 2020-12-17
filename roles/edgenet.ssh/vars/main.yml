@@ -1,0 +1,4 @@
+---
+# willshersystems.sshd
+sshd:
+  Port: "{{ edgenet_ssh_port }}"

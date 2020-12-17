@@ -1,8 +1,0 @@
-# geerlingguy.kubernetes
-# TODO: Do not join if already joined.
-kubernetes_join_command: kubeadm join 192.168.210.10:6443 --token efky4f.i636qpnsesc6aajn --discovery-token-ca-cert-hash sha256:2929bd614e7d4a02ed9ebf6a40a61dfab95d37ea4b27649ed6eea8543d19dc6b -v 5
-kubernetes_role: node
-# TODO: Pin kube* versions
-
-# geerlingguy.swap
-swap_file_state: absent

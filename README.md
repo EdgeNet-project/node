@@ -30,10 +30,16 @@ You can run the `node.yml` playbook manually, for example to deploy multiple nod
 ansible-pull -i node1.example,node2.example -K -U git@github.com:maxmouchet/node.git node.yml
 ```
 
+## Roles
+
+TODO: Describe roles.
+
 ## TODO
 
-TODO: Packer
-TODO: Handle ZFS-backed VMs?
-TODO: Asciinema
-TODO: Inside Docker?
-TODO: Schema with ansible->packer->vm/cloud/docker/...
+Call in bootstrap to EdgeNet ctrl to create the NC object, which creates the DNS entry, and calls back the playbook with the join token.
+Add the node name to the shell script.
+Pass token for existing users.
+
+- [ ] Packer
+- [ ] Asciinema
+- [ ] Squash commits

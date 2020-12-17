@@ -1,0 +1,35 @@
+---
+# passwordless sudo
+- name: Make sure we have a 'wheel' group
+  group:
+    name: wheel
+    state: present
+
+- name: Allow 'wheel' group to have passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+# EdgeNet user
+- name: "Create the EdgeNet user ({{ edgenet_ssh_user }})"
+  user:
+    name: "{{ edgenet_ssh_user }}"
+    home: "/{{ edgenet_ssh_user }}"
+    groups: wheel
+    append: yes
+    createhome: yes
+    comment: EdgeNet (edge-net.org)
+
+# SSH access
+- name: Install EdgeNet public SSH key
+  ansible.posix.authorized_key:
+    user: "{{ edgenet_ssh_user }}"
+    key: "{{ edgenet_ssh_public_key }}"
+    state: present
+
+- name: Install the SSH server
+  import_role:
+    name: willshersystems.sshd

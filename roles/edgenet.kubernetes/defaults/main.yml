@@ -1,0 +1,3 @@
+---
+edgenet_node_name: "{{ ansible_default_ipv4.macaddress | regex_replace(':', '-') }}"
+edgenet_node_namespace: edgenet

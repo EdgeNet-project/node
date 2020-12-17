@@ -1,0 +1,41 @@
+---
+- name: Set the hostname
+  hostname:
+    name: "{{ edgenet_node_name }}.edgenet.io"
+
+- name: Disable swap (as expected by Kubernetes)
+  import_role:
+    name: geerlingguy.swap
+
+- name: Install Docker
+  import_role:
+    name: geerlingguy.docker
+
+# NOTE: EdgeNet is not yet tested with containerd.
+# - name: Install containerd
+#   import_role:
+#     name: containerd
+
+- name: Install Kubernetes
+  import_role:
+    name: geerlingguy.kubernetes
+
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#letting-iptables-see-bridged-traffic
+# https://kubernetes.io/docs/setup/production-environment/container-runtimes/
+- name: Let iptables see bridged traffic
+  sysctl:
+    name: "{{ item }}"
+    value: "1"
+    state: present
+  loop:
+    - net.bridge.bridge-nf-call-iptables
+    - net.bridge.bridge-nf-call-ip6tables
+    - net.ipv4.ip_forward
+
+# Enable huge pages (Calico VPP requirement)
+# NOTE: Disabled for now as it conflicts with postgres.
+# - name: Enable Huge Pages
+#   sysctl:
+#     name: vm.nr_hugepages
+#     value: "128"
+#     state: present

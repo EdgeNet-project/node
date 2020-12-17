@@ -27,5 +27,11 @@ Vagrant.configure("2") do |config|
     c.vm.network "private_network", ip: "192.168.210.50"
   end
 
+  config.vm.define "ubuntu1804" do |c|
+    c.vm.box = "generic/ubuntu1804"
+    # c.vm.network "public_network"
+    # c.vm.network "private_network", ip: "192.168.210.60"
+  end
+
   config.vm.synced_folder ".", "/node"
 end

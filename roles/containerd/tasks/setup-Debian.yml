@@ -30,6 +30,7 @@
   args:
     warn: false
   when: add_repository_key is failed
+  tags: ['skip_ansible_lint']
 
 - name: Add containerd repository.
   apt_repository:
