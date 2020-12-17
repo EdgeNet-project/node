@@ -1,0 +1,18 @@
+---
+containerd_package: containerd.io
+containerd_package_state: present
+
+containerd_service_state: started
+containerd_service_enabled: true
+containerd_restart_handler_state: restarted
+
+containerd_apt_release_channel: stable
+containerd_apt_arch: amd64
+containerd_apt_repository: "deb [arch={{ containerd_apt_arch }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} {{ containerd_apt_release_channel }}"
+containerd_apt_ignore_key_error: true
+containerd_apt_gpg_key: https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg
+
+containerd_yum_repo_url: https://download.docker.com/linux/{{ (ansible_distribution == "Fedora") | ternary("fedora","centos") }}/docker-ce.repo
+containerd_yum_repo_enable_edge: '0'
+containerd_yum_repo_enable_test: '0'
+containerd_yum_gpg_key: https://download.docker.com/linux/centos/gpg

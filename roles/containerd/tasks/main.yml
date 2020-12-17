@@ -1,0 +1,50 @@
+---
+- include_tasks: setup-RedHat.yml
+  when: ansible_os_family == 'RedHat'
+
+- include_tasks: setup-Debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Install containerd.
+  package:
+    name: "{{ containerd_package }}"
+    state: "{{ containerd_package_state }}"
+  notify: restart containerd
+
+- name: Get containerd default configuration.
+  shell: containerd config default
+  register: containerd_config_default
+
+- name: Ensure /etc/containerd exists.
+  file:
+    path: /etc/containerd
+    state: directory
+
+- name: Configure containerd.
+  copy:
+    content: "{{ containerd_config_default.stdout }}"
+    dest: /etc/containerd/config.toml
+  notify: restart containerd
+
+- name: Ensure containerd is started and enabled at boot.
+  service:
+    name: containerd
+    state: "{{ containerd_service_state }}"
+    enabled: "{{ containerd_service_enabled }}"
+
+- name: Configure kernel modules.
+  copy:
+    src: containerd.conf
+    dest: /etc/modules-load.d/containerd.conf
+    mode: "0644"
+
+- name: Load kernel modules.
+  modprobe:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - br_netfilter
+    - overlay
+
+- name: Ensure handlers are notified now to avoid firewall conflicts.
+  meta: flush_handlers

@@ -1,0 +1,18 @@
+---
+- name: Ensure old versions of containerd are not installed.
+  package:
+    name: containerd
+    state: absent
+
+- name: Add containerd GPG key.
+  rpm_key:
+    key: "{{ containerd_yum_gpg_key }}"
+    state: present
+
+- name: Add containerd repository.
+  get_url:
+    url: "{{ containerd_yum_repo_url }}"
+    dest: '/etc/yum.repos.d/containerd.repo'
+    owner: root
+    group: root
+    mode: 0644

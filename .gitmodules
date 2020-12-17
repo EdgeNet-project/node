@@ -1,0 +1,6 @@
+[submodule "roles/geerlingguy.swap"]
+	path = roles/geerlingguy.swap
+	url = https://github.com/geerlingguy/ansible-role-swap.git
+[submodule "roles/geerlingguy.kubernetes"]
+	path = roles/geerlingguy.kubernetes
+	url = https://github.com/geerlingguy/ansible-role-kubernetes.git

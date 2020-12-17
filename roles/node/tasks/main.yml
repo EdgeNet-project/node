@@ -1,0 +1,124 @@
+---
+- name: Include distribution-specific variables
+  include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+
+- name: Disable swap (as expected by Kubernetes)
+  import_role:
+    name: geerlingguy.swap
+
+- name: Install containerd
+  import_role:
+    name: containerd
+
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#letting-iptables-see-bridged-traffic
+# https://kubernetes.io/docs/setup/production-environment/container-runtimes/
+- name: Let iptables see bridged traffic.
+  sysctl:
+    name: "{{ item }}"
+    value: '1'
+    state: present
+  loop:
+    - net.bridge.bridge-nf-call-iptables
+    - net.bridge.bridge-nf-call-ip6tables
+    - net.ipv4.ip_forward
+
+- name: Install Kubernetes
+  import_role:
+    name: geerlingguy.kubernetes
+
+# - name: Install Docker
+#   import_role:
+#     name: geerlingguy.docker
+#
+# - name: Copy Docker configuration
+#   copy:
+#     src: daemon.json
+#     dest: /etc/docker/daemon.json
+#     mode: '0644'
+#   notify:
+#     - restart docker
+#
+# - name: Install Kubernetes
+#   import_role:
+#     name: geerlingguy.kubernetes
+#
+# - include_role:
+#     name: geerlingguy.docker
+# - name: Create the EdgeNet user
+#   user:
+#     name: edgenet
+#     home: /edgenet
+#     createhome: yes
+#     comment: EdgeNet (edge-net.org)
+#
+# - name: Create .ssh directory for the EdgeNet user
+#   file:
+#     path: /edgenet/.ssh
+#     state: directory
+#     owner: edgenet
+#     mode: '0700'
+#
+# - name: Install EdgeNet public SSH key
+#   copy:
+#     dest: /edgenet/.ssh/authorized_keys
+#     owner: edgenet
+#     group: edgenet
+#     mode: '0600'
+#     content: |
+#       ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDv+9LemKEmusyhq+4TCy4Uq9y+dj3uAEBLR5ZqYVw5fATWif15PRB+TvN2YCcBGJqbtmNokKIiUQq6i53CbzmCdBVsEFBlanDUqt4xHjnJI4vnYyjeltepC6TmFDqRq15KutS2dVF2XQ6uH3LGSHXBDlaguDSpEP5pa3DaiZqRdUpAItFXY0g4O80g3qmzj1lzkb/5briRyB4wOBgT+J4fnbSawXbAaXV49TQhjMDyDDVTRNCiUwAa1jaAkh17rK4aweVu0t+rkGv42gpIyJEvWHGxXeSqbegjFYljsKeI21s8yzAHyxHDT90053Pno4vyrfAXWWJR5JlGl1tNy3P9 edgenet.planet-lab.eu
+#
+# - name: Install the SSH server
+#   package:
+#     name: openssh-server
+#     state: present
+#
+# - name: Enable and start the SSH server
+#   service:
+#     name: sshd
+#     enabled: yes
+#     state: started
+#
+# - name: Install DNF
+#   package:
+#     name:
+#       - dnf
+#       - dnf-plugins-core
+#     state: present
+#   when: ansible_facts['os_family'] == "RedHat"
+#
+# - name: Add Docker repository
+#   shell:
+#     cmd: dnf config-manager --add-repo "{{ docker_repository }}"
+#     warn: no
+#   when: ansible_facts['os_family'] == "RedHat"
+#
+# - name: Remove obsolete Docker versions
+#   package:
+#     name: "{{ docker_deprecated_packages }}"
+#     state: absent
+#
+# - name: Install Docker CE
+#   package:
+#     name: "{{ docker_packages }}"
+#     state: present
+#
+# - name: Enable and start Docker
+#   service:
+#     name: docker
+#     enabled: yes
+#     state: started
+#
+#
+# # - name: Add Kubernetes repository
+# #   yum_repository:
+# #     name: kubernetes
+# #     description: Kubernetes
+# #     baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+# #     gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+# #     gpgcheck: yes
+# #     repo_gpgcheck: yes
+# #     exclude: kube*
+# #
+# #
+# #
+# #
