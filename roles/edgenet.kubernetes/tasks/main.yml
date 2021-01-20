@@ -3,6 +3,12 @@
   hostname:
     name: "{{ edgenet_node_name }}.edgenet.io"
 
+- name: Update /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: ".edgenet.io$"
+    line: "127.0.0.1 {{ edgenet_node_name }}.edgenet.io"
+
 - name: Disable swap (as expected by Kubernetes)
   import_role:
     name: geerlingguy.swap
