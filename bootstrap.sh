@@ -1,33 +1,31 @@
 #!/bin/sh
-
 set -eu
-export DEBIAN_FRONTEND=noninteractive
 
 # For debugging/development, set this to "file://." or another local directory.
 EDGENET_REPOSITORY="${EDGENET_REPOSITORY:-https://github.com/EdgeNet-project/node.git}"
 EDGENET_PLAYBOOK="${EDGENET_PLAYBOOK:-edgenet-node-full.yml}"
 
 # Some systems do not have sudo, in this case do not use it.
-SUDO="sudo"
-if ! command -v "${SUDO}" >/dev/null 2>&1; then
-    SUDO=""
-fi
+SUDO=""
+command -v sudo >/dev/null 2>&1 && SUDO="sudo"
 
-# Fetch the OS identifier.
-ID="unknown"
+# OS-specific variables.
+ID="Unknown"
+VERSION_ID="Unknown"
 . /etc/os-release
 
-case ${ID} in
-    centos)
+case "${ID}-${VERSION_ID}" in
+    centos-8)
         ${SUDO} yum install --assumeyes epel-release
-        ${SUDO} yum install --assumeyes ansible git python3-pip
+        ${SUDO} yum install --assumeyes ansible git python3-openshift
         ;;
 
-    fedora)
-        ${SUDO} dnf install --assumeyes ansible git python3-pip
+    fedora-32|fedora-33)
+        ${SUDO} dnf install --assumeyes ansible git python3-openshift
         ;;
 
-    debian)
+    debian-9)
+        export DEBIAN_FRONTEND=noninteractive
         ${SUDO} apt update
         ${SUDO} apt install --yes dirmngr software-properties-common
         ${SUDO} apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
@@ -36,7 +34,8 @@ case ${ID} in
         ${SUDO} apt install --yes ansible git python3-pip
         ;;
 
-    ubuntu)
+    ubuntu-18*|ubuntu-19*|ubuntu-20*|ubuntu-21*)
+        export DEBIAN_FRONTEND=noninteractive
         ${SUDO} apt update
         ${SUDO} apt install --yes dirmngr software-properties-common
         ${SUDO} apt-add-repository --yes --update ppa:ansible/ansible
@@ -44,7 +43,7 @@ case ${ID} in
         ;;
 
     *)
-        echo "Unsupported operating system: ${ID}"
+        echo "Unsupported operating system: ${ID}-${VERSION_ID}"
         exit 1
         ;;
 esac

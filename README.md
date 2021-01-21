@@ -13,6 +13,8 @@ ensure that the machine has a public IP address and run the following command on
 curl https://edge-net.org/bootstrap.sh | bash
 ```
 
+Supported operating systems: Debian 9+, CentOS 8+, Fedora 32+, Ubuntu 18.04+.
+
 ### In the cloud
 
 We have pre-built images for the major cloud providers.

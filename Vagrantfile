@@ -2,35 +2,28 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.define "centos7" do |c|
-    c.vm.box = "generic/centos7"
-    c.vm.network "private_network", ip: "192.168.210.20"
+  config.vm.define "centos8" do |c|
+    c.vm.box = "geerlingguy/centos8"
   end
 
   config.vm.define "debian9" do |c|
-    c.vm.box = "generic/debian9"
-    c.vm.network "private_network", ip: "192.168.210.30"
+    c.vm.box = "debian/contrib-stretch64"
   end
 
-  # config.vm.define "fedora25" do |c|
-  #   c.vm.box = "generic/fedora25"
-  #   c.vm.network "private_network", ip: "192.168.210.40"
-  # end
-
-  config.vm.define "fedora31" do |c|
-    c.vm.box = "generic/fedora31"
-    c.vm.network "private_network", ip: "192.168.210.40"
+  config.vm.define "fedora32" do |c|
+    c.vm.box = "fedora/32-cloud-base"
   end
 
-  config.vm.define "ubuntu1604" do |c|
-    c.vm.box = "generic/ubuntu1604"
-    c.vm.network "private_network", ip: "192.168.210.50"
+  config.vm.define "fedora33" do |c|
+    c.vm.box = "fedora/33-cloud-base"
   end
 
   config.vm.define "ubuntu1804" do |c|
-    c.vm.box = "generic/ubuntu1804"
-    # c.vm.network "public_network"
-    # c.vm.network "private_network", ip: "192.168.210.60"
+    c.vm.box = "ubuntu/bionic64"
+  end
+
+  config.vm.define "ubuntu2004" do |c|
+    c.vm.box = "ubuntu/focal64"
   end
 
   config.vm.synced_folder ".", "/node"
