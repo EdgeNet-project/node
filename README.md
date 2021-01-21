@@ -13,7 +13,7 @@ ensure that the machine has a public IP address and run the following command on
 curl https://edge-net.org/bootstrap.sh | bash
 ```
 
-Supported operating systems: Debian 9+, CentOS 8+, Fedora 32+, Ubuntu 18.04+.
+Supported operating systems: CentOS 8+, Fedora 32+, Ubuntu 18.04+.
 
 ### In the cloud
 
@@ -29,12 +29,14 @@ gcloud compute instances create ...
 
 You can run the `node.yml` playbook manually, for example to deploy multiple nodes at once:
 ```bash
-ansible-pull -i node1.example,node2.example -K -U git@github.com:maxmouchet/node.git node.yml
+ansible-pull -i node1.example,node2.example -K -U git@github.com:EdgeNet-project/node.git node.yml
 ```
 
 ## Roles
 
 TODO: Describe roles.
+
+TODO: Describe variables
 
 ## TODO
 
