@@ -5,7 +5,3 @@
     - edgenet.kubernetes
   vars_files:
     - vars/main.yml
-  vars_prompt:
-    - name: edgenet_node_name
-      prompt: Please choose a node name (no spaces)
-      private: no

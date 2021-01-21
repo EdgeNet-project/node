@@ -1,4 +1,4 @@
 ---
 edgenet_ssh_user: edgenet
-edgenet_ssh_port: 22
+edgenet_ssh_port: 25010
 edgenet_ssh_public_key: https://raw.githubusercontent.com/EdgeNet-project/edgenet/master/configs/id_rsa.pub
