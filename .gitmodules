@@ -1,0 +1,18 @@
+[submodule "roles/ansible-role-docker"]
+	path = roles/geerlingguy.docker
+	url = https://github.com/geerlingguy/ansible-role-docker.git
+[submodule "roles/ansible-role-kubernetes"]
+	path = roles/geerlingguy.kubernetes
+	url = https://github.com/geerlingguy/ansible-role-kubernetes.git
+[submodule "roles/ansible-role-swap"]
+	path = roles/geerlingguy.swap
+	url = https://github.com/geerlingguy/ansible-role-swap.git
+[submodule "roles/willshersystems.sshd"]
+	path = roles/willshersystems.sshd
+	url = https://github.com/willshersystems/ansible-sshd.git
+[submodule "collections/ansible/posix"]
+	path = ansible_collections/ansible/posix
+	url = https://github.com/ansible-collections/ansible.posix.git
+[submodule "collections/ansible/general"]
+	path = ansible_collections/ansible/general
+	url = https://github.com/ansible-collections/community.general.git

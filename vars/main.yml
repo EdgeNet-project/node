@@ -1,5 +1,0 @@
-# geerlingguy.docker
-docker_package: "docker-ce=5:19.03*"
-# geerlingguy.kubernetes
-kubernetes_version: "1.19"
-kubernetes_version_rhel_package: "1.19"

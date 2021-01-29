@@ -10,7 +10,7 @@
 If you want to dedicate a physical (e.g. a Raspberry Pi) or a virtual machine to the EdgeNet project,
 ensure that the machine has a public IP address and run the following command on the target machine:
 ```bash
-curl https://edge-net.org/bootstrap.sh | bash
+bash -c "$(wget -O - https://edge-net.org/bootstrap.sh)"
 ```
 
 Supported operating systems: CentOS 8+, Fedora 32+, Ubuntu 18.04+.
@@ -34,9 +34,20 @@ ansible-pull -i node1.example,node2.example -K -U git@github.com:EdgeNet-project
 
 ## Roles
 
-TODO: Describe roles.
+Name | Description | Variables
+-----|-------------|----------
+[edgenet.ssh](/roles/edgenet.ssh) | Create an EdgeNet user with SSH access and passwordless sudo | `edgenet_ssh_user`, `edgenet_ssh_port`, `edgenet_ssh_public_key`
+[edgenet.kubernetes](/roles/edgenet.kubernetes) | Setup Docker and Kubernetes | `edgenet_node_name`, `edgenet_node_namespace`, `edgenet_docker_version`, `edgenet_kubernetes_version`
 
-TODO: Describe variables
+
+## Development
+
+```bash
+# To test the boostrap script locally, for example:
+export EDGENET_REPOSITORY=$(pwd)
+export EDGENET_REPOSITORY_CLONE=0
+./bootstrap.sh
+```
 
 ## TODO
 
