@@ -15,13 +15,21 @@
   vars:
     swap_file_state: absent
 
-- name: Install Docker
+- name: Install Docker (Debian)
   import_role:
     name: geerlingguy.docker
   vars:
     docker_install_compose: false
-    # TODO: Variable for RHEL
     docker_package: "docker-ce=5:{{ edgenet_docker_version }}*"
+  when: ansible_os_family == 'Debian'
+
+- name: Install Docker (RedHat)
+  import_role:
+    name: geerlingguy.docker
+  vars:
+    docker_install_compose: false
+    docker_package: "docker-ce-3:{{ edgenet_docker_version }}*"
+  when: ansible_os_family == 'RedHat'
 
 - name: Configure Docker daemon
   copy:
@@ -41,7 +49,7 @@
   vars:
     kubernetes_role: "" # We do not want the role to run `kubeadm join` for us.
     kubernetes_version: "{{ edgenet_kubernetes_version }}"
-    kubernetes_version_rhel_package: "{{ edgenet_kubernetes_version }}"
+    kubernetes_version_rhel_package: "0:{{ edgenet_kubernetes_version }}*"
 
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#letting-iptables-see-bridged-traffic
 # https://kubernetes.io/docs/setup/production-environment/container-runtimes/

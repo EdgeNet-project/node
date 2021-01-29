@@ -1,5 +1,10 @@
 ---
 # passwordless sudo
+- name: Make sure 'sudo' is installed
+  package:
+    name: sudo
+    state: present
+
 - name: Make sure we have a 'wheel' group
   group:
     name: wheel
