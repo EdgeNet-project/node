@@ -13,7 +13,7 @@ ensure that the machine has a public IP address and run the following command on
 bash -c "$(wget -O - https://edge-net.org/bootstrap.sh)"
 ```
 
-Supported operating systems: CentOS 8+, Fedora 32+, Ubuntu 18.04+.  
+Supported operating systems: CentOS 8+, Fedora 32+, Ubuntu 18.04+.
 See [Bootstrap](#Bootstrap) for more information.
 
 ### In the cloud
@@ -28,7 +28,7 @@ gcloud compute instances create ...
 
 ## Bootstrap
 
-The [`bootstrap.sh`](/bootstrap.sh) script installs Ansible and Git, and runs the node playbook.  
+The [`bootstrap.sh`](/bootstrap.sh) script installs Ansible and Git, and runs the node playbook.
 The script can be configured with the following environment variables:
 
 Name | Default | Description
@@ -38,6 +38,7 @@ Name | Default | Description
 `EDGENET_PLAYBOOK` | edgenet-node-full.yml | Name of the playbook to run.
 `EDGENET_NODE_NAME` | `$(cat /etc/machine-id)` | Name to be used for the EdgeNet node.
 `EDGENET_SSH_PORT` | 25010 | SSH port to be used for remote access.
+`EDGENET_ASK_CONFIRMATION` | 1 | Whether to ask to continue or not.
 
 ## Roles
 

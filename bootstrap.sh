@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -eu
 
 # URL of the Git repository containing the playbook to run.
@@ -16,7 +16,10 @@ EDGENET_NODE_NAME="${EDGENET_NODE_NAME:-$(cat /etc/machine-id)}"
 # SSH port to be used for remote access.
 EDGENET_SSH_PORT="${EDGENET_SSH_PORT:-25010}"
 
-echo "Welcome to EdgeNet!"
+# Whether to ask to continue or not.
+EDGENET_ASK_CONFIRMATION="${EDGENET_ASK_CONFIRMATION:-1}"
+
+echo -e "\033[1mWelcome to EdgeNet!\033[0m"
 echo "Project homepage: https://edge-net.org/"
 echo "Node setup instructions: https://github.com/EdgeNet-project/node/"
 echo
@@ -26,12 +29,13 @@ echo "EDGENET_REPOSITORY_CLONE=${EDGENET_REPOSITORY_CLONE}"
 echo "EDGENET_PLAYBOOK=${EDGENET_PLAYBOOK}"
 echo "EDGENET_NODE_NAME=${EDGENET_NODE_NAME}"
 echo "EDGENET_SSH_PORT=${EDGENET_SSH_PORT}"
+echo "EDGENET_ASK_CONFIRMATION=${EDGENET_ASK_CONFIRMATION}"
 
 echo
 echo "To change these values, set the appropriate environement variable."
 echo "For example: 'export EDGENET_SSH_PORT=25010'."
 echo "Press any key to continue, or CTRL+C to exit..."
-read -r _
+[ "${EDGENET_ASK_CONFIRMATION}" -eq 1 ] && read -r _
 
 is_not_installed() {
     ! command -v "$1" >/dev/null 2>&1
