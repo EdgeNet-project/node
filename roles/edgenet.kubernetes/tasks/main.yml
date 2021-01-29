@@ -23,6 +23,13 @@
     # TODO: Variable for RHEL
     docker_package: "docker-ce=5:{{ edgenet_docker_version }}*"
 
+- name: Configure Docker daemon
+  copy:
+    src: docker-daemon.json
+    dest: /etc/docker/daemon.json
+    mode: "0644"
+  notify: restart docker
+
 # NOTE: EdgeNet is not yet tested with containerd.
 # - name: Install containerd
 #   import_role:
