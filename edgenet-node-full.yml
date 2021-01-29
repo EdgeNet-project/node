@@ -7,4 +7,4 @@
     # NOTE: NodeContribution server side code is not ready yet.
     # - edgenet.nodecontribution
   vars_files:
-    - vars/main.yml
+    - vars/edgenet-production.yml
