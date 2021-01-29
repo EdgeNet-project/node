@@ -26,15 +26,6 @@ aws create-instance ...
 gcloud compute instances create ...
 ```
 
-### Other options
-
-You can run the Ansible playbooks manually, for example to deploy multiple nodes at once:
-```bash
-ansible-pull -i node1.example,node2.example -K -U git@github.com:EdgeNet-project/node.git node.yml
-```
-
-See [Roles](#Roles) for more information.
-
 ## Bootstrap
 
 The [`bootstrap.sh`](/bootstrap.sh) script installs Ansible and Git, and runs the node playbook.  
@@ -49,6 +40,8 @@ Name | Default | Description
 `EDGENET_SSH_PORT` | 25010 | SSH port to be used for remote access.
 
 ## Roles
+
+This repository contains the following Ansible roles:
 
 Name | Description | Variables | Defaults
 -----|-------------|-----------|---------
