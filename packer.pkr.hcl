@@ -1,5 +1,21 @@
 variable "google_project" {
-    type    = string
+    type = string
+}
+
+variable "azure_subscription_id" {
+    type = string
+}
+
+source "azure-arm" "edgenet-node" {
+    managed_image_name = "edgenet-node"
+    managed_image_resource_group_name = "edgenet"
+    location        = "West Europe"
+    vm_size         = "B1ms"
+    os_type         = "Linux"
+    image_publisher = "Canonical"
+    image_offer     = "0001-com-ubuntu-server-focal"
+    image_sku       = "20_04-lts"
+    subscription_id = "${var.azure_subscription_id}"
 }
 
 source "amazon-ebs" "edgenet-node" {
@@ -31,6 +47,7 @@ source "googlecompute" "edgenet-node" {
 
 build {
     sources = [
+        "source.azure-arm.edgenet-node",
         "source.amazon-ebs.edgenet-node",
         "source.googlecompute.edgenet-node"
     ]
