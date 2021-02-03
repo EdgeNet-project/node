@@ -5,6 +5,18 @@
 
 ## Contribute an EdgeNet node
 
+### In a public cloud
+
+We have pre-built images for the major cloud providers.
+Simply run one of the following to deploy a node:
+```bash
+az vm create ...
+aws ec2 run-instances --image-id ami-04fe1e49f9fd33bac --instance-type t3.small
+gcloud compute instances create ...
+```
+
+TODO: Recommended instances types, disk size, ...
+
 ### From a dedicated machine
 
 If you want to dedicate a physical (e.g. a Raspberry Pi) or a virtual machine to the EdgeNet project,
@@ -15,16 +27,6 @@ bash -c "$(wget -O - https://edge-net.org/bootstrap.sh)"
 
 Supported operating systems: CentOS 8+, Fedora 32+, Ubuntu 18.04+.
 See [Bootstrap](#Bootstrap) for more information.
-
-### In the cloud
-
-We have pre-built images for the major cloud providers.
-Simply run one of the following to deploy a node:
-```bash
-az vm create ...
-aws create-instance ...
-gcloud compute instances create ...
-```
 
 ## Bootstrap
 
