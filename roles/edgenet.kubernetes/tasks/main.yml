@@ -1,31 +1,15 @@
 ---
 - name: Set the hostname
-  hostname:
-    name: "{{ edgenet_node_name }}.edgenet.io"
-
-- name: Update /etc/hosts
-  lineinfile:
-    path: /etc/hosts
-    regexp: ".edgenet.io$"
-    line: "127.0.0.1 {{ edgenet_node_name }}.edgenet.io"
-
-- name: Install public IP update script
   copy:
-    src: update-public-ip.sh
-    dest: /usr/bin/update-public-ip.sh
-    mode: "0755"
-
-- name: Install public IP update systemd service
-  copy:
-    src: update-public-ip.service
-    dest: /etc/systemd/system/update-public-ip.service
+    content: "{{ edgenet_node_name }}.edgenet.io"
+    dest:  /etc/edgenet-hostname
     mode: "0644"
 
-- name: Enable public IP systemd service
-  systemd:
-    name: update-public-ip
-    enabled: yes
-    state: restarted
+- name: Install the hostname update service
+  include_tasks: hostname-service.yml
+
+- name: Install the public IP update service
+  include_tasks: public-ip-service.yml
 
 - name: Disable swap (as expected by Kubernetes)
   import_role:

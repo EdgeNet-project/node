@@ -1,0 +1,18 @@
+---
+- name: Hostname update / install script
+  copy:
+    src: update-hostname.sh
+    dest: /usr/bin/update-hostname.sh
+    mode: "0755"
+
+- name: Hostname update / install systemd service
+  copy:
+    src: update-hostname.service
+    dest: /etc/systemd/system/update-hostname.service
+    mode: "0644"
+
+- name: Hostname update / enable systemd service
+  systemd:
+    name: update-hostname
+    enabled: yes
+    state: restarted

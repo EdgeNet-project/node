@@ -1,0 +1,11 @@
+[Unit]
+Description=Update the hostname to the one set in /etc/edgenet-hostname
+After=network.target
+After=network-online.target
+
+[Service]
+ExecStart=/usr/bin/update-hostname.sh
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target

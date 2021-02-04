@@ -1,8 +1,9 @@
 #!/bin/sh
 set -ux
 
-# Assign public IPs to internal interfaces.
-# Major public clouds rewrite the src/dst IP of outbound/inbound packets.
+# Some cloud providers use NAT to rewrite the source/dest. IPs of the packets:
+# private IP <-> public IP.
+# We assign the public IP to the internal interface, for kubelet to work.
 
 alias curl="curl --max-time 0.5 --show-error --silent --header 'Metadata-Flavor: Google'"
 
