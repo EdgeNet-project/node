@@ -5,28 +5,7 @@
 
 ## Contribute an EdgeNet node
 
-### In a public cloud
-
-We have pre-built images for the major cloud providers.
-Simply run one of the following to deploy a node:
-```bash
-az vm create ...
-aws ec2 run-instances --image-id ami-04fe1e49f9fd33bac --instance-type t3.small
-gcloud compute instances create ...
-```
-
-TODO: Recommended instances types, disk size, ...
-
-### From a dedicated machine
-
-If you want to dedicate a physical (e.g. a Raspberry Pi) or a virtual machine to the EdgeNet project,
-ensure that the machine has a public IP address and run the following command on the target machine:
-```bash
-bash -c "$(wget -O - https://edge-net.org/bootstrap.sh)"
-```
-
-Supported operating systems: CentOS 8+, Fedora 32+, Ubuntu 18.04+.
-See [Bootstrap](#Bootstrap) for more information.
+For instructions on how to use and how to contribute a node to EdgeNet, please see the [EdgeNet website](https://edgenet-project.github.io/).
 
 ## Bootstrap
 
@@ -62,10 +41,5 @@ export EDGENET_REPOSITORY_CLONE=0
 
 ## TODO
 
-Call in bootstrap to EdgeNet ctrl to create the NC object, which creates the DNS entry, and calls back the playbook with the join token.
-Add the node name to the shell script.
-Pass token for existing users.
-
-- [ ] Packer
+- [ ] Pass token for existing users.
 - [ ] Asciinema
-- [ ] Squash commits
