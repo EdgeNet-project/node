@@ -53,7 +53,7 @@ VERSION_ID="Unknown"
 # Install Ansible and git if not present.
 if is_not_installed ansible || is_not_installed git; then
     case "${ID}-${VERSION_ID}" in
-        centos-8)
+        centos-7|centos-8)
             ${SUDO} yum install --assumeyes epel-release
             ${SUDO} yum install --assumeyes ansible git
             ;;
@@ -94,7 +94,7 @@ fi
 # Run the node playbook.
 export ANSIBLE_COLLECTIONS_PATHS="${LOCAL_REPOSITORY}"
 ansible-playbook --connection local \
-                 --extra-vars "ansible_python_interpreter=/usr/bin/python3" \
+                 --extra-vars "ansible_python_interpreter=/usr/bin/python2" \
                  --extra-vars "edgenet_node_name=${EDGENET_NODE_NAME}" \
                  --extra-vars "edgenet_ssh_port_alt=${EDGENET_SSH_PORT_ALT}" \
                  --inventory "localhost," \
