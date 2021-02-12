@@ -51,7 +51,7 @@
   vars:
     kubernetes_role: "" # We do not want the role to run `kubeadm join` for us.
     kubernetes_version: "{{ edgenet_kubernetes_version }}"
-    kubernetes_version_rhel_package: "0:{{ edgenet_kubernetes_version }}*"
+    kubernetes_version_rhel_package: "{{ edgenet_kubernetes_version }}*"
 
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#letting-iptables-see-bridged-traffic
 # https://kubernetes.io/docs/setup/production-environment/container-runtimes/
