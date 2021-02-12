@@ -13,8 +13,8 @@ EDGENET_PLAYBOOK="${EDGENET_PLAYBOOK:-edgenet-node-full.yml}"
 # Name to be used for the edgenet node.
 EDGENET_NODE_NAME="${EDGENET_NODE_NAME:-$(cat /etc/machine-id)}"
 
-# SSH port to be used for remote access.
-EDGENET_SSH_PORT="${EDGENET_SSH_PORT:-25010}"
+# Alternateive SSH port to be used for remote access.
+EDGENET_SSH_PORT_ALT="${EDGENET_SSH_PORT_ALT:-25010}"
 
 # Whether to ask to continue or not.
 EDGENET_ASK_CONFIRMATION="${EDGENET_ASK_CONFIRMATION:-1}"
@@ -28,12 +28,12 @@ echo "EDGENET_REPOSITORY=${EDGENET_REPOSITORY}"
 echo "EDGENET_REPOSITORY_CLONE=${EDGENET_REPOSITORY_CLONE}"
 echo "EDGENET_PLAYBOOK=${EDGENET_PLAYBOOK}"
 echo "EDGENET_NODE_NAME=${EDGENET_NODE_NAME}"
-echo "EDGENET_SSH_PORT=${EDGENET_SSH_PORT}"
+echo "EDGENET_SSH_PORT_ALT=${EDGENET_SSH_PORT_ALT}"
 echo "EDGENET_ASK_CONFIRMATION=${EDGENET_ASK_CONFIRMATION}"
 
 echo
 echo "To change these values, set the appropriate environement variable."
-echo "For example: 'export EDGENET_SSH_PORT=25010'."
+echo "For example: 'export EDGENET_SSH_PORT_ALT=25010'."
 echo "Press any key to continue, or CTRL+C to exit..."
 [ "${EDGENET_ASK_CONFIRMATION}" -eq 1 ] && read -r _
 
@@ -96,6 +96,6 @@ export ANSIBLE_COLLECTIONS_PATHS="${LOCAL_REPOSITORY}"
 ansible-playbook --connection local \
                  --extra-vars "ansible_python_interpreter=/usr/bin/python3" \
                  --extra-vars "edgenet_node_name=${EDGENET_NODE_NAME}" \
-                 --extra-vars "edgenet_ssh_port=${EDGENET_SSH_PORT}" \
+                 --extra-vars "edgenet_ssh_port_alt=${EDGENET_SSH_PORT_ALT}" \
                  --inventory "localhost," \
                  "${LOCAL_REPOSITORY}/${EDGENET_PLAYBOOK}"

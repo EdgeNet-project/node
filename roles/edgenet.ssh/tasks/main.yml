@@ -35,9 +35,9 @@
     key: "{{ edgenet_ssh_public_key }}"
     state: present
 
-- name: Install the SSH server
-  import_role:
-    name: willshersystems.sshd
-  vars:
-    sshd:
-      Port: "{{ edgenet_ssh_port }}"
+# - name: Install the SSH server
+  # import_role:
+  #   name: willshersystems.sshd
+  # vars:
+  #   sshd:
+      # Port: "{{ edgenet_ssh_port }}"
