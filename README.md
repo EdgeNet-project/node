@@ -41,5 +41,8 @@ export EDGENET_REPOSITORY_CLONE=0
 
 ## TODO
 
+- [ ] Fix install of public SSH key on Google Cloud (use API/instance metadata)
+- [ ] Fix hostname edge-net.io
+- [ ] Auto-naming of the nodes? edge-net-gcp-...?
 - [ ] Pass token for existing users.
 - [ ] Asciinema
