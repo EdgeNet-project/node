@@ -6,10 +6,10 @@
     mode: "0644"
 
 - name: Install the hostname update service
-  include_tasks: hostname-service.yml
+  include_tasks: service-hostname.yml
 
 - name: Install the public IP update service
-  include_tasks: public-ip-service.yml
+  include_tasks: service-public-ip.yml
 
 - name: Disable swap (as expected by Kubernetes)
   import_role:
@@ -40,18 +40,13 @@
     mode: "0644"
   notify: restart docker
 
-# NOTE: EdgeNet is not yet tested with containerd.
-# - name: Install containerd
-#   import_role:
-#     name: containerd
-
 - name: Install Kubernetes
   import_role:
     name: geerlingguy.kubernetes
   vars:
     kubernetes_role: "" # We do not want the role to run `kubeadm join` for us.
     kubernetes_version: "{{ edgenet_kubernetes_version }}"
-    kubernetes_version_rhel_package: "0:{{ edgenet_kubernetes_version }}*"
+    kubernetes_version_rhel_package: "*{{ edgenet_kubernetes_version }}*"
 
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#letting-iptables-see-bridged-traffic
 # https://kubernetes.io/docs/setup/production-environment/container-runtimes/
