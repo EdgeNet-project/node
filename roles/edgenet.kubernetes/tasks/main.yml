@@ -1,7 +1,7 @@
 ---
 - name: Set the hostname
   copy:
-    content: "{{ edgenet_node_name }}.edgenet.io"
+    content: "{{ edgenet_node_name }}.edge-net.io"
     dest:  /etc/edgenet-hostname
     mode: "0644"
 

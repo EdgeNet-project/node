@@ -10,7 +10,7 @@ hostname=$(cat /etc/edgenet-hostname)
 hostnamectl set-hostname "${hostname}"
 
 # Update /etc/hosts
-sed -i.bak '/.edgenet.io$/d' /etc/hosts
+sed -i.bak '/.edge-net.io$/d' /etc/hosts
 echo "127.0.0.1 ${hostname}" | tee -a /etc/hosts
 
 # Restart kubelet if installed
