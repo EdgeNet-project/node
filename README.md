@@ -3,11 +3,11 @@
   <i>The globally distributed edge cloud for Internet researchers.</i>
 </p>
 
-## Contribute an EdgeNet node
+## :cloud: Contribute an EdgeNet node
 
 For instructions on how to use and how to contribute a node to EdgeNet, please see the [EdgeNet website](https://edgenet-project.github.io/).
 
-## Bootstrap
+## Bootstrap script
 
 The [`bootstrap.sh`](/bootstrap.sh) script installs Ansible and Git, and runs the node playbook.
 The script can be configured with the following environment variables:
@@ -21,7 +21,7 @@ Name | Default | Description
 `EDGENET_SSH_PORT_ALT` | 25010 | Alternative SSH port to be used for remote access.
 `EDGENET_ASK_CONFIRMATION` | 1 | Whether to ask to continue or not.
 
-## Roles
+## Ansible roles
 
 This repository contains the following Ansible roles:
 
