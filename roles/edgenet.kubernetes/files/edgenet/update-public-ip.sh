@@ -18,6 +18,7 @@ if get http://169.254.169.254/latest/meta-data >/dev/null; then
   ip4=$(get http://169.254.169.254/latest/meta-data/public-ipv4)
   dev=$(ip --brief link | grep "${mac}" | cut -d ' ' -f 1)
   ip addr add "${ip4}/32" dev "${dev}" || true
+  echo "KUBELET_EXTRA_ARGS=--node-ip ${ip4}" | tee >/etc/default/kubelet
   exit
 fi
 
@@ -28,5 +29,6 @@ if get http://metadata.google.internal/computeMetadata/v1/instance/ >/dev/null; 
   ip4=$(get http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip)
   dev=$(ip --brief link | grep "${mac}" | cut -d ' ' -f 1)
   ip addr add "${ip4}/32" dev "${dev}" || true
+  echo "KUBELET_EXTRA_ARGS=--node-ip ${ip4}" | tee >/etc/default/kubelet
   exit
 fi

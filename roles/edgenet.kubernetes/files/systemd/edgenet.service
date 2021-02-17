@@ -1,0 +1,15 @@
+[Unit]
+Description=EdgeNet
+Documentation=https://edge-net.org/
+
+After=network-online.target
+Before=kubelet.service
+Wants=kubelet.service
+
+[Service]
+ExecStart=/opt/edgenet/update-hostname.sh
+ExecStart=/opt/edgenet/update-public-ip.sh
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target

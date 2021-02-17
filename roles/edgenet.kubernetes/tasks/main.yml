@@ -1,17 +1,23 @@
 ---
-- name: Set the hostname
+- name: Install EdgeNet files
+  copy:
+    src: edgenet/
+    dest: /opt/edgenet
+    mode: "0755"
+
+- name: Create the hostname file
   copy:
     content: "{{ edgenet_node_name }}.edge-net.io"
-    dest:  /etc/edgenet-hostname
+    dest:  "/opt/edgenet/hostname"
     mode: "0644"
 
-- name: Install the hostname update service
-  include_tasks: service-hostname.yml
+- name: Install EdgeNet service
+  copy:
+    src: systemd/edgenet.service
+    dest: /etc/systemd/system/edgenet.service
+    mode: "0644"
 
-- name: Install the public IP update service
-  include_tasks: service-public-ip.yml
-
-- name: Disable swap (as expected by Kubernetes)
+- name: Disable swap
   import_role:
     name: geerlingguy.swap
   vars:
@@ -33,13 +39,6 @@
     docker_package: "docker-ce-3:{{ edgenet_docker_version }}*"
   when: ansible_os_family == 'RedHat'
 
-- name: Configure Docker daemon
-  copy:
-    src: docker-daemon.json
-    dest: /etc/docker/daemon.json
-    mode: "0644"
-  notify: restart docker
-
 - name: Install Kubernetes
   import_role:
     name: geerlingguy.kubernetes
@@ -47,6 +46,19 @@
     kubernetes_role: "" # We do not want the role to run `kubeadm join` for us.
     kubernetes_version: "{{ edgenet_kubernetes_version }}"
     kubernetes_version_rhel_package: "*{{ edgenet_kubernetes_version }}*"
+
+- name: Configure Docker
+  copy:
+    src: docker/daemon.json
+    dest: /etc/docker/daemon.json
+    mode: "0644"
+  notify: restart docker
+
+- name: Configure NetworkManager
+  copy:
+    src: NetworkManager/calico.conf
+    dest: /etc/NetworkManager/conf.d/calico.conf
+    mode: "0644"
 
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#letting-iptables-see-bridged-traffic
 # https://kubernetes.io/docs/setup/production-environment/container-runtimes/
@@ -59,6 +71,19 @@
     - net.bridge.bridge-nf-call-iptables
     - net.bridge.bridge-nf-call-ip6tables
     - net.ipv4.ip_forward
+
+# https://docs.projectcalico.org/maintenance/troubleshoot/troubleshooting#configure-networkmanager
+- name: Increase conntrack table size
+  sysctl:
+    name: net.netfilter.nf_conntrack_max
+    value: 1000000
+    state: present
+
+- name: Enable EdgeNet service
+  systemd:
+    name: edgenet
+    enabled: yes
+    state: restarted
 
 # Enable huge pages (Calico VPP requirement)
 # NOTE: Disabled for now as it conflicts with postgres.

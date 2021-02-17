@@ -11,6 +11,7 @@ EDGENET_REPOSITORY_CLONE="${EDGENET_REPOSITORY_CLONE:-1}"
 EDGENET_PLAYBOOK="${EDGENET_PLAYBOOK:-edgenet-node-full.yml}"
 
 # Name to be used for the edgenet node.
+# TODO: Fetch the hostname from /etc/edgenet-hostname if it exists.
 EDGENET_NODE_NAME="${EDGENET_NODE_NAME:-$(cat /etc/machine-id)}"
 
 # Alternative SSH port to be used for remote access.
