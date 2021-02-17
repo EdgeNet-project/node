@@ -1,9 +1,12 @@
 ---
 # passwordless sudo
-- name: Make sure 'sudo' is installed
+- name: Make sure 'bash' and 'sudo' are installed
   package:
-    name: sudo
+    name: "{{ item }}"
     state: present
+  with_items:
+    - bash
+    - sudo
 
 - name: Make sure we have a 'wheel' group
   group:
@@ -23,6 +26,7 @@
   user:
     name: "{{ edgenet_ssh_user }}"
     home: "/{{ edgenet_ssh_user }}"
+    shell: /bin/bash
     groups: wheel
     append: yes
     createhome: yes
