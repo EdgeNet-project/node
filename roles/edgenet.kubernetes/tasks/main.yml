@@ -54,6 +54,11 @@
     mode: "0644"
   notify: restart docker
 
+- name: Ensures NetworkManager conf.d exists
+  file:
+    path: /etc/NetworkManager/conf.d
+    state: directory
+
 - name: Configure NetworkManager
   copy:
     src: NetworkManager/calico.conf

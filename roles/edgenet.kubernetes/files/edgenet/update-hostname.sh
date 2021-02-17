@@ -4,7 +4,7 @@ set -eux
 # Some hosts change their hostname on boot,
 # we (re)set the correct hostname here.
 
-hostname=$(cat /etc/edgenet/hostname)
+hostname=$(cat /opt/edgenet/hostname)
 
 # Update /etc/hostname
 hostnamectl set-hostname "${hostname}"
