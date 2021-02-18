@@ -33,16 +33,14 @@ Name | Description | Variables | Defaults
 ## Development
 
 ```bash
-# To test the boostrap script locally, for example:
-export EDGENET_REPOSITORY=$(pwd)
-export EDGENET_REPOSITORY_CLONE=0
+git clone --recursive git@github.com:EdgeNet-project/node.git
+export EDGENET_REPOSITORY=. EDGENET_REPOSITORY_CLONE=0
 ./bootstrap.sh
 ```
 
 ## TODO
 
 - [ ] Fix install of public SSH key on Google Cloud (use API/instance metadata)
-- [ ] Fix hostname edge-net.io
 - [ ] Auto-naming of the nodes? edge-net-gcp-...?
 - [ ] Pass token for existing users.
 - [ ] Asciinema
