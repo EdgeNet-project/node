@@ -1,34 +1,60 @@
 #!/bin/sh
-set -ux
+# shellcheck disable=SC2086
+set -eux
 
-# On some cloud providers, instances with a public IP are behind a NAT.
-# The instances have a private IP on their interface, and the gateway
-# replace it with the public IP.
-# We assign the public IP to the internal interface, as required by kubelet.
+# Cloud providers assign a public IP to instances through NAT.
+# The instance only sees an private _internal_ IP.
+# This is problematic for Kubernetes, which expects to see the public IP on the interface.
+# In this script, we assign the public IP to the instance interface.
+
+# TODO: Should this be in an Ansible playbook instead?
 
 # NOTE: curl on CentOS 7 doesn't support fractional values for --max-time.
+# NOTE: We use a max-time of 2 seconds since some API take some time to reply.
 get() {
-  curl --fail --max-time 1 --silent --show-error --header "Metadata-Flavor: Google" "$1"
+  curl --fail --max-time 2 --silent --show-error --header "Metadata-Flavor: Google" "$1"
 }
+
+dev="unknown"   # Interface name
+intip="unknown" # Internal IP
+pubip="unknown" # Public IP
 
 # EC2
 if get http://169.254.169.254/latest/meta-data >/dev/null; then
   echo "Amazon EC2 detected"
-  mac=$(get http://169.254.169.254/latest/meta-data/mac)
-  ip4=$(get http://169.254.169.254/latest/meta-data/public-ipv4)
-  dev=$(ip --brief link | grep "${mac}" | cut -d ' ' -f 1)
-  ip addr add "${ip4}/32" dev "${dev}" || true
-  echo "KUBELET_EXTRA_ARGS=--node-ip ${ip4}" | tee >/etc/default/kubelet
-  exit
+  intip=$(get http://169.254.169.254/latest/meta-data/local-ipv4)
+  pubip=$(get http://169.254.169.254/latest/meta-data/public-ipv4)
 fi
 
 # GCP
 if get http://metadata.google.internal/computeMetadata/v1/instance/ >/dev/null; then
   echo "Google Compute Engine detected"
-  mac=$(get http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/mac)
-  ip4=$(get http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip)
-  dev=$(ip --brief link | grep "${mac}" | cut -d ' ' -f 1)
-  ip addr add "${ip4}/32" dev "${dev}" || true
-  echo "KUBELET_EXTRA_ARGS=--node-ip ${ip4}" | tee >/etc/default/kubelet
-  exit
+  intip=$(get http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip)
+  pubip=$(get http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip)
 fi
+
+# Scaleway
+if get http://169.254.42.42/conf >/dev/null; then
+  echo "Scaleway Compute detected"
+  intip=$(get http://169.254.42.42/conf | grep PRIVATE_IP | cut -d = -f 2)
+  pubip=$(get http://169.254.42.42/conf | grep PUBLIC_IP_ADDRESS | cut -d = -f 2)
+fi
+
+# Find the interface which has the internal IP.
+dev=$(ip --brief addr | grep "${intip}" | cut -d ' ' -f 1)
+
+# Add the public IP address to the public interface (if not already).
+if ip --brief addr show dev "${dev}" | grep -v "${pubip}"; then
+  ip addr add "${pubip}/32" dev "${dev}"
+fi
+
+# Rewrite the source IP address of outgoing packet with the internal IP.
+# Some providers filter packets with a source IP != internal IP.
+chain="POSTROUTING"
+rule="--table nat --jump SNAT --source ${pubip} --to ${intip}"
+if ! iptables --check ${chain} ${rule} 2>/dev/null; then
+  iptables --append ${chain} ${rule}
+fi
+
+# Configure kubelet to use the public IP as the node IP.
+echo "KUBELET_EXTRA_ARGS=--node-ip ${pubip}" | tee >/etc/default/kubelet
