@@ -1,9 +1,30 @@
 #!/bin/sh
+# vim: et sw=2 ts=2
 set -eux
 
-# Some hosts change their hostname on boot,
-# we (re)set the correct hostname here.
+. /opt/edgenet/common.sh
 
+# Generate a hostname if not set
+if [ ! -f /opt/edgenet/hostname ]; then
+  hash=$(rand 'a-f0-9' 4)
+
+  if aws >/dev/null; then
+    region=$(aws placement/availability-zone)
+    hostname="aws-${region}-${hash}"
+  elif gcp >/dev/null; then
+    region=$(gcp zone | cut --delimiter '/' --field 4)
+    hostname="gcp-${region}-${hash}"
+  elif scw >/dev/null; then
+    region=$(scw LOCATION_ZONE_ID)
+    hostname="scw-${region}-${hash}"
+  else
+    hostname="$(geoip)-${hash}"
+  fi
+
+  echo "${hostname}.edge-net.io" > /opt/edgenet/hostname
+fi
+
+# Read the saved hostname
 hostname=$(cat /opt/edgenet/hostname)
 
 # Update /etc/hostname
