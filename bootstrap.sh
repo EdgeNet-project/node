@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2086
 set -eu
 
 # Whether to ask to continue or not.
@@ -12,7 +13,6 @@ EDGENET_REPOSITORY="${EDGENET_REPOSITORY:-https://github.com/EdgeNet-project/nod
 
 # Whether to clone or not the Git repository (useful for local development).
 EDGENET_REPOSITORY_CLONE="${EDGENET_REPOSITORY_CLONE:-1}"
-
 
 echo -e "\033[1mWelcome to EdgeNet!\033[0m"
 echo "Project homepage: https://edge-net.org/"
@@ -44,28 +44,29 @@ VERSION_ID="Unknown"
 
 # Install Ansible and git if not present.
 if is_not_installed ansible || is_not_installed git; then
+  echo "Installing Ansible..."
   case "${ID}-${VERSION_ID}" in
   centos-7 | centos-8)
-    ${SUDO} yum install --assumeyes epel-release
-    ${SUDO} yum install --assumeyes ansible git
+    ${SUDO} yum install --assumeyes --quiet epel-release
+    ${SUDO} yum install --assumeyes --quiet ansible git
     ;;
 
   fedora-32 | fedora-33)
-    ${SUDO} dnf install --assumeyes ansible git
+    ${SUDO} dnf install --assumeyes --quiet ansible git
     ;;
 
   ubuntu-18* | ubuntu-19*)
     export DEBIAN_FRONTEND=noninteractive
-    ${SUDO} apt update
-    ${SUDO} apt install --yes dirmngr software-properties-common
+    ${SUDO} apt update --quiet
+    ${SUDO} apt install --quiet --yes dirmngr software-properties-common
     ${SUDO} apt-add-repository --yes --update ppa:ansible/ansible
-    ${SUDO} apt install --yes ansible git
+    ${SUDO} apt install --quiet --yes ansible git
     ;;
 
   ubuntu-20* | ubuntu-21*)
     export DEBIAN_FRONTEND=noninteractive
-    ${SUDO} apt update
-    ${SUDO} apt install --yes ansible git
+    ${SUDO} apt update --quiet
+    ${SUDO} apt install --quiet --yes ansible git
     ;;
 
   *)
@@ -92,8 +93,8 @@ esac
 # Fetch the repository.
 if [ "${EDGENET_REPOSITORY_CLONE}" -eq 1 ]; then
   LOCAL_REPOSITORY=$(mktemp -d)
-  # shellcheck disable=SC2086
-  git clone --depth 1 --recursive ${GIT_EXTRA_OPTS} \
+  echo "Cloning ${EDGENET_REPOSITORY} to ${LOCAL_REPOSITORY}..."
+  git clone --depth 1 --quiet --recursive ${GIT_EXTRA_OPTS} \
     "${EDGENET_REPOSITORY}" "${LOCAL_REPOSITORY}"
 else
   LOCAL_REPOSITORY="${EDGENET_REPOSITORY}"
