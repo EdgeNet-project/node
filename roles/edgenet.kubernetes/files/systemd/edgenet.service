@@ -9,6 +9,7 @@ Wants=kubelet.service
 [Service]
 ExecStart=/opt/edgenet/update-hostname.sh
 ExecStart=/opt/edgenet/update-public-ip.sh
+ExecStart=/opt/edgenet/join-cluster.sh
 Type=oneshot
 
 [Install]

@@ -39,6 +39,11 @@ geoip() {
   echo "${country}-${region}"| tr '[:upper:]' '[:lower:]'
 }
 
+# Return the public IP address as seen from the Internet
+pubip() {
+  get "https://freegeoip.app/csv/" | cut --delimiter ',' --fields 1
+}
+
 # Generate a random string containing chars $1 with length $2.
 # Example: rand 'a-f0-9' 4
 rand() {
