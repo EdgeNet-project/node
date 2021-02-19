@@ -43,5 +43,4 @@ if ! iptables --check ${chain} ${rule} 2>/dev/null; then
 fi
 
 # Configure kubelet to use the public IP as the node IP.
-# TODO: It should not be needed to set the cgroup driver here.
-echo "KUBELET_EXTRA_ARGS=--cgroup-driver systemd --node-ip ${pubip}" | tee >/etc/default/kubelet
+echo "KUBELET_EXTRA_ARGS=--node-ip ${pubip}" | tee >/etc/default/kubelet

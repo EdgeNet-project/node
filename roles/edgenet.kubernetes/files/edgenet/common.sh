@@ -47,5 +47,5 @@ pubip() {
 # Generate a random string containing chars $1 with length $2.
 # Example: rand 'a-f0-9' 4
 rand() {
-  tr --complement --delete "$1" < /dev/urandom | fold --width "$2" | head --lines 1
+  dd bs=512 count=1 if=/dev/urandom | tr --complement --delete "$1" | fold --width "$2" | head --lines 1
 }
