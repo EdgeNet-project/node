@@ -1,3 +1,0 @@
----
-edgenet_node_name: "{{ ansible_facts.machine_id }}"
-edgenet_node_namespace: edgenet

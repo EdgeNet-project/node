@@ -1,40 +1,31 @@
 #!/bin/bash
 set -eu
 
+# Whether to ask to continue or not.
+EDGENET_ASK_CONFIRMATION="${EDGENET_ASK_CONFIRMATION:-1}"
+
+# Name of the playbook to run.
+EDGENET_PLAYBOOK="${EDGENET_PLAYBOOK:-edgenet-node-full.yml}"
+
 # URL of the Git repository containing the playbook to run.
 EDGENET_REPOSITORY="${EDGENET_REPOSITORY:-https://github.com/EdgeNet-project/node.git}"
 
 # Whether to clone or not the Git repository (useful for local development).
 EDGENET_REPOSITORY_CLONE="${EDGENET_REPOSITORY_CLONE:-1}"
 
-# Name of the playbook to run.
-EDGENET_PLAYBOOK="${EDGENET_PLAYBOOK:-edgenet-node-full.yml}"
-
-# Name to be used for the edgenet node.
-# TODO: Fetch the hostname from /etc/edgenet-hostname if it exists.
-EDGENET_NODE_NAME="${EDGENET_NODE_NAME:-$(cat /etc/machine-id)}"
-
-# Alternative SSH port to be used for remote access.
-EDGENET_SSH_PORT_ALT="${EDGENET_SSH_PORT_ALT:-25010}"
-
-# Whether to ask to continue or not.
-EDGENET_ASK_CONFIRMATION="${EDGENET_ASK_CONFIRMATION:-1}"
 
 echo -e "\033[1mWelcome to EdgeNet!\033[0m"
 echo "Project homepage: https://edge-net.org/"
-echo "Node setup instructions: https://github.com/EdgeNet-project/node/"
 echo
 
+echo "EDGENET_ASK_CONFIRMATION=${EDGENET_ASK_CONFIRMATION}"
+echo "EDGENET_PLAYBOOK=${EDGENET_PLAYBOOK}"
 echo "EDGENET_REPOSITORY=${EDGENET_REPOSITORY}"
 echo "EDGENET_REPOSITORY_CLONE=${EDGENET_REPOSITORY_CLONE}"
-echo "EDGENET_PLAYBOOK=${EDGENET_PLAYBOOK}"
-echo "EDGENET_NODE_NAME=${EDGENET_NODE_NAME}"
-echo "EDGENET_SSH_PORT_ALT=${EDGENET_SSH_PORT_ALT}"
-echo "EDGENET_ASK_CONFIRMATION=${EDGENET_ASK_CONFIRMATION}"
 
 echo
 echo "To change these values, set the appropriate environement variable."
-echo "For example: 'export EDGENET_SSH_PORT_ALT=25010'."
+echo "For example: 'export EDGENET_ASK_CONFIRMATION=0'."
 echo "Press any key to continue, or CTRL+C to exit..."
 [ "${EDGENET_ASK_CONFIRMATION}" -eq 1 ] && read -r _
 
@@ -112,7 +103,5 @@ fi
 export ANSIBLE_COLLECTIONS_PATHS="${LOCAL_REPOSITORY}"
 ansible-playbook --connection local \
   --extra-vars "ansible_python_interpreter=${PYTHON}" \
-  --extra-vars "edgenet_node_name=${EDGENET_NODE_NAME}" \
-  --extra-vars "edgenet_ssh_port_alt=${EDGENET_SSH_PORT_ALT}" \
   --inventory "localhost," \
   "${LOCAL_REPOSITORY}/${EDGENET_PLAYBOOK}"

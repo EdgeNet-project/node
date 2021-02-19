@@ -5,12 +5,6 @@
     dest: /opt/edgenet
     mode: "0755"
 
-- name: Create the hostname file
-  copy:
-    content: "{{ edgenet_node_name }}.edge-net.io"
-    dest:  "/opt/edgenet/hostname"
-    mode: "0644"
-
 - name: Install EdgeNet service
   copy:
     src: systemd/edgenet.service
