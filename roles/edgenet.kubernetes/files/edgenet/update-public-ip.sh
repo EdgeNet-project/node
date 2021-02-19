@@ -15,9 +15,9 @@ dev="unknown"   # Interface name
 intip="unknown" # Internal IP
 pubip="unknown" # Public IP
 
-if ec2 >/dev/null; then
-  intip=$(ec2 local-ipv4)
-  pubip=$(ec2 public-ipv4)
+if aws >/dev/null; then
+  intip=$(aws local-ipv4)
+  pubip=$(aws public-ipv4)
 elif gcp >/dev/null; then
   intip=$(gcp network-interfaces/0/ip)
   pubip=$(gcp network-interfaces/0/access-configs/0/external-ip)

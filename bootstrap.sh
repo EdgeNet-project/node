@@ -1,5 +1,6 @@
 #!/bin/bash
 # shellcheck disable=SC2086
+# vim: et sw=2 ts=2
 set -eu
 
 # Whether to ask to continue or not.
@@ -11,8 +12,8 @@ EDGENET_PLAYBOOK="${EDGENET_PLAYBOOK:-edgenet-node-full.yml}"
 # URL of the Git repository containing the playbook to run.
 EDGENET_REPOSITORY="${EDGENET_REPOSITORY:-https://github.com/EdgeNet-project/node.git}"
 
-# Whether to clone or not the Git repository (useful for local development).
-EDGENET_REPOSITORY_CLONE="${EDGENET_REPOSITORY_CLONE:-1}"
+# Whether to start or not the EdgeNet service (useful for Cloud/VM images).
+EDGENET_SERVICE_START="${EDGENET_SERVICE_START:-1}"
 
 echo -e "\033[1mWelcome to EdgeNet!\033[0m"
 echo "Project homepage: https://edge-net.org/"
@@ -21,7 +22,7 @@ echo
 echo "EDGENET_ASK_CONFIRMATION=${EDGENET_ASK_CONFIRMATION}"
 echo "EDGENET_PLAYBOOK=${EDGENET_PLAYBOOK}"
 echo "EDGENET_REPOSITORY=${EDGENET_REPOSITORY}"
-echo "EDGENET_REPOSITORY_CLONE=${EDGENET_REPOSITORY_CLONE}"
+echo "EDGENET_SERVICE_START=${EDGENET_SERVICE_START}"
 
 echo
 echo "To change these values, set the appropriate environement variable."
@@ -91,7 +92,7 @@ centos-7)
 esac
 
 # Fetch the repository.
-if [ "${EDGENET_REPOSITORY_CLONE}" -eq 1 ]; then
+if [ "${EDGENET_REPOSITORY}" != "." ]; then
   LOCAL_REPOSITORY=$(mktemp -d)
   echo "Cloning ${EDGENET_REPOSITORY} to ${LOCAL_REPOSITORY}..."
   git clone --depth 1 --quiet --recursive ${GIT_EXTRA_OPTS} \
@@ -100,9 +101,16 @@ else
   LOCAL_REPOSITORY="${EDGENET_REPOSITORY}"
 fi
 
+# Populate the `edgenet_service_state` variable.
+edgenet_service_state="stopped"
+if [ "${EDGENET_SERVICE_START}" -eq 1 ]; then
+  edgenet_service_state="restarted"
+fi
+
 # Run the node playbook.
 export ANSIBLE_COLLECTIONS_PATHS="${LOCAL_REPOSITORY}"
 ansible-playbook --connection local \
   --extra-vars "ansible_python_interpreter=${PYTHON}" \
+  --extra-vars "edgenet_service_state=${edgenet_service_state}" \
   --inventory "localhost," \
   "${LOCAL_REPOSITORY}/${EDGENET_PLAYBOOK}"

@@ -83,7 +83,7 @@
   systemd:
     name: edgenet
     enabled: yes
-    state: restarted
+    state: "{{ edgenet_service_state }}"
 
 # Enable huge pages (Calico VPP requirement)
 # NOTE: Disabled for now as it conflicts with postgres.

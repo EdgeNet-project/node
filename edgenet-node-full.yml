@@ -4,7 +4,5 @@
   roles:
     - edgenet.ssh
     - edgenet.kubernetes
-    # NOTE: NodeContribution server side code is not ready yet.
-    # - edgenet.nodecontribution
   vars_files:
     - vars/edgenet-production.yml
