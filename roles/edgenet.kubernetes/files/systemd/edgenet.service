@@ -1,15 +1,17 @@
 [Unit]
 Description=EdgeNet
 Documentation=https://edge-net.org/
-
-After=network-online.target
+After=ssh.service
 Before=kubelet.service
-Wants=kubelet.service
+StartLimitBurst=2
+StartLimitIntervalSec=600
 
 [Service]
 ExecStart=/opt/edgenet/update-hostname.sh
 ExecStart=/opt/edgenet/update-public-ip.sh
 ExecStart=/opt/edgenet/join-cluster.sh
+Restart=on-failure
+RestartSec=10s
 Type=oneshot
 
 [Install]

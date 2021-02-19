@@ -76,7 +76,7 @@
 - name: Increase conntrack table size
   sysctl:
     name: net.netfilter.nf_conntrack_max
-    value: 1000000
+    value: "1000000"
     state: present
 
 - name: Enable EdgeNet service
