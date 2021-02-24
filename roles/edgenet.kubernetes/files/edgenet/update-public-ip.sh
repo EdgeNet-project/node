@@ -34,6 +34,13 @@ if ip --brief addr show dev "${dev}" | grep -v "${pubip}"; then
   ip addr add "${pubip}/32" dev "${dev}"
 fi
 
+# Rewrite the destination IP address of incoming packets with the public IP.
+chain="PREROUTING"
+rule="--table nat --jump DNAT --source ${intip} --to ${pubip}"
+if ! iptables --check ${chain} ${rule} 2>/dev/null; then
+  iptables --append ${chain} ${rule}
+fi
+
 # Rewrite the source IP address of outgoing packet with the internal IP.
 # Some providers filter packets with a source IP != internal IP.
 chain="POSTROUTING"

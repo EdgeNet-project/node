@@ -41,6 +41,13 @@
     kubernetes_version: "{{ edgenet_kubernetes_version }}"
     kubernetes_version_rhel_package: "*{{ edgenet_kubernetes_version }}*"
 
+- name: Install network debug tools
+  package:
+    name:
+      - ipset
+      - net-tools
+    state: present
+
 - name: Configure Docker
   copy:
     src: docker/daemon.json
