@@ -16,7 +16,7 @@ EDGENET_REPOSITORY="${EDGENET_REPOSITORY:-https://github.com/EdgeNet-project/nod
 EDGENET_SERVICE_START="${EDGENET_SERVICE_START:-1}"
 
 echo -e "\033[1mWelcome to EdgeNet!\033[0m"
-echo "Project homepage: https://edge-net.org/"
+echo -e "\033[1mhttps://edge-net.org/\033[0m"
 echo
 
 echo "EDGENET_ASK_CONFIRMATION=${EDGENET_ASK_CONFIRMATION}"
@@ -27,7 +27,7 @@ echo "EDGENET_SERVICE_START=${EDGENET_SERVICE_START}"
 echo
 echo "To change these values, set the appropriate environement variable."
 echo "For example: 'export EDGENET_ASK_CONFIRMATION=0'."
-echo "Press any key to continue, or CTRL+C to exit..."
+echo -e "\033[1mPress any key to continue, or CTRL+C to exit...\033[0m"
 [ "${EDGENET_ASK_CONFIRMATION}" -eq 1 ] && read -r _
 
 is_not_installed() {
