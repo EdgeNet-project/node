@@ -1,5 +1,5 @@
 # edgenet.kubernetes
-# edgenet_docker_version: 19.03
+edgenet_docker_version: 19.03
 # Fedora 33 only supports Docker 20.10+ due to cgroups v2.
-edgenet_docker_version: 20.10
+# edgenet_docker_version: 20.10
 edgenet_kubernetes_version: 1.19
