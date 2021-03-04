@@ -22,15 +22,14 @@
     validate: 'visudo -cf %s'
 
 # EdgeNet user
-#- name: "Create the EdgeNet user ({{ edgenet_ssh_user }})"
-#  user:
-#    name: "{{ edgenet_ssh_user }}"
-#    home: "/{{ edgenet_ssh_user }}"
-#    shell: /bin/bash
-#    groups: wheel
-#    append: yes
-#    createhome: yes
-#    comment: EdgeNet (edge-net.org)
+- name: "Create the EdgeNet user ({{ edgenet_ssh_user }})"
+  user:
+    name: "{{ edgenet_ssh_user }}"
+    shell: /bin/bash
+    groups: wheel
+    append: yes
+    createhome: yes
+    comment: EdgeNet (edge-net.org)
 
 # SSH access
 - name: Install EdgeNet public SSH key
