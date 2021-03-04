@@ -41,7 +41,13 @@ is_not_installed sudo && SUDO=""
 # OS-specific variables.
 ID="Unknown"
 VERSION_ID="Unknown"
-. /etc/os-release
+
+if [ -f /etc/os-release ]; then
+  . /etc/os-release
+fi
+
+# Run sudo once to avoid asking for the password later
+${SUDO} true
 
 # Install Ansible and git if not present.
 if is_not_installed ansible || is_not_installed git; then
