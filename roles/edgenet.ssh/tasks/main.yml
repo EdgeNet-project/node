@@ -1,12 +1,12 @@
 ---
-# passwordless sudo
-- name: Make sure 'bash' and 'sudo' are installed
+- name: Install 'bash', 'sudo' and 'openssh-server'
   package:
     name: "{{ item }}"
     state: present
   with_items:
     - bash
     - sudo
+    - openssh-server
 
 - name: Make sure we have a 'wheel' group
   group:
@@ -21,7 +21,6 @@
     line: '%wheel ALL=(ALL) NOPASSWD: ALL'
     validate: 'visudo -cf %s'
 
-# EdgeNet user
 - name: "Create the EdgeNet user ({{ edgenet_ssh_user }})"
   user:
     name: "{{ edgenet_ssh_user }}"
@@ -31,16 +30,23 @@
     createhome: yes
     comment: EdgeNet (edge-net.org)
 
-# SSH access
-- name: Install EdgeNet public SSH key
+- name: Install the EdgeNet public SSH key
   ansible.posix.authorized_key:
     user: "{{ edgenet_ssh_user }}"
     key: "{{ edgenet_ssh_public_key }}"
     state: present
 
-# - name: Install the SSH server
-  # import_role:
-  #   name: willshersystems.sshd
-  # vars:
-  #   sshd:
-      # Port: "{{ edgenet_ssh_port }}"
+- name: "Set SSH ports (22 and {{ edgenet_ssh_port_alt }})"
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    line: "{{ item }}"
+    state: present
+  with_items:
+    - "Port 22"
+    - "Port {{ edgenet_ssh_port_alt }}"
+
+- name: Enable the SSH server
+  systemd:
+    name: ssh
+    enabled: yes
+    state: reloaded
