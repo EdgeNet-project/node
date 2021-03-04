@@ -27,7 +27,12 @@ gcp() {
 
 # Query Scaleway instance metadata
 scw() {
-  get http://169.254.42.42/conf | grep "${1-}" | cut --delimiter '=' --fields 2
+  res=$(get http://169.254.42.42/conf)
+  status=$?
+  if [ $status -eq 0 ]; then
+    echo "${res}" | grep "${1-}" | cut --delimiter '=' --fields 2
+  fi
+  return $status
 }
 
 # Return the country and the region inferred from the IP address
