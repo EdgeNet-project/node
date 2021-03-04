@@ -47,6 +47,6 @@
 
 - name: Enable the SSH server
   systemd:
-    name: ssh
+    name: sshd
     enabled: yes
     state: reloaded

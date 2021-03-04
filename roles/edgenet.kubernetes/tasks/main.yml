@@ -17,13 +17,35 @@
   vars:
     swap_file_state: absent
 
-- name: Install Docker (Debian)
+- name: Install required network utilities
+  package:
+    name:
+      - ipset
+      - iptables
+      - net-tools
+    state: present
+
+- name: Install Docker (Debian x86-64)
   import_role:
     name: geerlingguy.docker
   vars:
+    docker_apt_arch: amd64
     docker_install_compose: false
     docker_package: "docker-ce=5:{{ edgenet_docker_version }}*"
-  when: ansible_os_family == 'Debian'
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_architecture == 'x86_64'
+
+- name: Install Docker (Debian ARM64)
+  import_role:
+    name: geerlingguy.docker
+  vars:
+    docker_apt_arch: arm64
+    docker_install_compose: false
+    docker_package: "docker-ce=5:{{ edgenet_docker_version }}*"
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_architecture == 'aarch64'
 
 - name: Install Docker (RedHat)
   import_role:
@@ -33,20 +55,14 @@
     docker_package: "docker-ce-3:{{ edgenet_docker_version }}*"
   when: ansible_os_family == 'RedHat'
 
-- name: Install Kubernetes
+- name: Install Kubernetes (x86-64)
   import_role:
     name: geerlingguy.kubernetes
   vars:
     kubernetes_role: "" # We do not want the role to run `kubeadm join` for us.
     kubernetes_version: "{{ edgenet_kubernetes_version }}"
     kubernetes_version_rhel_package: "*{{ edgenet_kubernetes_version }}*"
-
-- name: Install network debug tools
-  package:
-    name:
-      - ipset
-      - net-tools
-    state: present
+    kubernetes_yum_arch: "{{ ansible_architecture }}"
 
 - name: Configure Docker
   copy:
