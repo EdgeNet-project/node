@@ -69,7 +69,6 @@
     src: docker/daemon.json
     dest: /etc/docker/daemon.json
     mode: "0644"
-  notify: restart docker
 
 - name: Ensures NetworkManager conf.d exists
   file:
@@ -101,6 +100,13 @@
     name: net.netfilter.nf_conntrack_max
     value: "1000000"
     state: present
+
+# This is necessary since we have changed the daemon configuration
+- name: Restart Docker
+  systemd:
+    name: edgenet
+    enabled: yes
+    state: restarted
 
 - name: Enable EdgeNet service
   systemd:

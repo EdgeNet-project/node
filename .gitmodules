@@ -7,9 +7,6 @@
 [submodule "roles/ansible-role-swap"]
 	path = roles/geerlingguy.swap
 	url = https://github.com/geerlingguy/ansible-role-swap.git
-[submodule "roles/willshersystems.sshd"]
-	path = roles/willshersystems.sshd
-	url = https://github.com/willshersystems/ansible-sshd.git
 [submodule "collections/ansible/posix"]
 	path = ansible_collections/ansible/posix
 	url = https://github.com/ansible-collections/ansible.posix.git
