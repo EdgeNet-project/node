@@ -104,7 +104,7 @@
 # This is necessary since we have changed the daemon configuration
 - name: Restart Docker
   systemd:
-    name: edgenet
+    name: docker
     enabled: yes
     state: restarted
 
