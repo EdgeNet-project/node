@@ -34,9 +34,3 @@ Name | Description | Variables | Defaults
 git clone --recursive git@github.com:EdgeNet-project/node.git
 env EDGENET_REPOSITORY=. ./bootstrap.sh
 ```
-
-## TODO
-
-- [ ] Fix install of public SSH key on Google Cloud (use API/instance metadata)
-- [ ] Pass token for existing users.
-- [ ] Asciinema
