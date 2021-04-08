@@ -5,7 +5,7 @@ set -eux
 . /opt/edgenet/common.sh
 
 hostname=$(cat /opt/edgenet/hostname)
-kubeconfig_url=$(cat /opt/edgenet/public.cfg)
+kubeconfig=/opt/edgenet/public.cfg
 pubip=$(pubip)
 
 for cmd in kubeadm kubectl kubelet; do
