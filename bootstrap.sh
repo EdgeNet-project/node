@@ -6,6 +6,9 @@ set -eu
 # Whether to ask to continue or not.
 EDGENET_ASK_CONFIRMATION="${EDGENET_ASK_CONFIRMATION:-1}"
 
+# URL of the cluster public kubeconfig file.
+EDGENET_KUBECONFIG="${EDGENET_KUBECONFIG:-https://raw.githubusercontent.com/EdgeNet-project/edgenet/master/configs/public.cfg}"
+
 # Name of the playbook to run.
 EDGENET_PLAYBOOK="${EDGENET_PLAYBOOK:-edgenet-node-full.yml}"
 
@@ -15,11 +18,13 @@ EDGENET_REPOSITORY="${EDGENET_REPOSITORY:-https://github.com/EdgeNet-project/nod
 # Whether to start or not the EdgeNet service (useful for Cloud/VM images).
 EDGENET_SERVICE_START="${EDGENET_SERVICE_START:-1}"
 
-echo -e "\033[1mWelcome to EdgeNet!\033[0m"
-echo -e "\033[1mhttps://edge-net.org/\033[0m"
+echo -e "\033[1mWelcome to EdgeNet! (https://edge-net.org/)\033[0m"
+echo -e "This script will install Ansible, and download and run the EdgeNet node playbook."
+echo -e "In case of problem, contact \033[1medgenet-support@planet-lab.eu\033[0m."
 echo
 
 echo "EDGENET_ASK_CONFIRMATION=${EDGENET_ASK_CONFIRMATION}"
+echo "EDGENET_KUBECONFIG=${EDGENET_KUBECONFIG}"
 echo "EDGENET_PLAYBOOK=${EDGENET_PLAYBOOK}"
 echo "EDGENET_REPOSITORY=${EDGENET_REPOSITORY}"
 echo "EDGENET_SERVICE_START=${EDGENET_SERVICE_START}"
@@ -27,7 +32,7 @@ echo "EDGENET_SERVICE_START=${EDGENET_SERVICE_START}"
 echo
 echo "To change these values, set the appropriate environement variable."
 echo "For example: 'export EDGENET_ASK_CONFIRMATION=0'."
-echo -e "\033[1mPress any key to continue, or CTRL+C to exit...\033[0m"
+echo -e "\033[1mPress Enter to continue, or CTRL+C to exit...\033[0m"
 [ "${EDGENET_ASK_CONFIRMATION}" -eq 1 ] && read -r _
 
 is_not_installed() {
@@ -118,5 +123,6 @@ export ANSIBLE_COLLECTIONS_PATHS="${LOCAL_REPOSITORY}"
 ansible-playbook --connection local \
   --extra-vars "ansible_python_interpreter=${PYTHON}" \
   --extra-vars "edgenet_service_state=${edgenet_service_state}" \
+  --extra-vars "edgenet_kubeconfig_url=${EDGENET_KUBECONFIG}" \
   --inventory "localhost," \
   "${LOCAL_REPOSITORY}/${EDGENET_PLAYBOOK}"

@@ -5,7 +5,7 @@ set -eux
 . /opt/edgenet/common.sh
 
 hostname=$(cat /opt/edgenet/hostname)
-kubeconfig_url="https://raw.githubusercontent.com/EdgeNet-project/edgenet/master/configs/public.cfg"
+kubeconfig_url=$(cat /opt/edgenet/public.cfg)
 pubip=$(pubip)
 
 for cmd in kubeadm kubectl kubelet; do
@@ -16,9 +16,6 @@ for cmd in kubeadm kubectl kubelet; do
 done
 
 if [ ! -f /var/lib/kubelet/config.yaml ]; then
-  kubeconfig=$(mktemp)
-  curl --location --show-error --silent --output "${kubeconfig}" "${kubeconfig_url}"
-
   nodecontribution=$(mktemp)
   cat << EOF > "${nodecontribution}"
 apiVersion: apps.edgenet.io/v1alpha

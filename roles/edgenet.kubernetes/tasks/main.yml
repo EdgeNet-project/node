@@ -11,6 +11,12 @@
     dest: /etc/systemd/system/edgenet.service
     mode: "0644"
 
+- name: Download kubeconfig file
+  get_url:
+    url: "{{ edgenet_kubeconfig_url }}"
+    dest: /opt/edgenet/public.cfg
+    mode: "0644"
+
 - name: Disable swap
   import_role:
     name: geerlingguy.swap
