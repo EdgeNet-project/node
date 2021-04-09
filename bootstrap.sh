@@ -96,22 +96,18 @@ fi
 # so we adjust the parameters in consequence.
 case "${ID}-${VERSION_ID}" in
 centos-7)
-  GIT_EXTRA_OPTS=""
-  PYTHON="/usr/bin/python2"
-  ;;
+  PYTHON="/usr/bin/python2" ;;
 
 *)
-  GIT_EXTRA_OPTS="--jobs 4 --shallow-submodules"
-  PYTHON="/usr/bin/python3"
-  ;;
+  PYTHON="/usr/bin/python3" ;;
 esac
 
 # Fetch the repository.
 if [ "${EDGENET_REPOSITORY}" != "." ]; then
   LOCAL_REPOSITORY=$(mktemp -d)
   echo "Cloning ${EDGENET_REPOSITORY} to ${LOCAL_REPOSITORY}..."
-  git clone --depth 1 --quiet --recursive --single-branch --branch "${EDGENET_BRANCH}" \
-    ${GIT_EXTRA_OPTS} "${EDGENET_REPOSITORY}" "${LOCAL_REPOSITORY}"
+  git clone --depth 1 --quiet --single-branch --branch "${EDGENET_BRANCH}" \
+    "${EDGENET_REPOSITORY}" "${LOCAL_REPOSITORY}"
 else
   LOCAL_REPOSITORY="${EDGENET_REPOSITORY}"
 fi
