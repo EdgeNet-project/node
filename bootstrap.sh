@@ -6,6 +6,9 @@ set -eu
 # Whether to ask to continue or not.
 EDGENET_ASK_CONFIRMATION="${EDGENET_ASK_CONFIRMATION:-1}"
 
+# Which branch of the node repository to use.
+EDGENET_BRANCH="${EDGENET_BRANCH:-main}"
+
 # URL of the cluster public kubeconfig file.
 EDGENET_KUBECONFIG="${EDGENET_KUBECONFIG:-https://raw.githubusercontent.com/EdgeNet-project/edgenet/master/configs/public.cfg}"
 
@@ -24,6 +27,7 @@ echo -e "In case of problem, contact \033[1medgenet-support@planet-lab.eu\033[0m
 echo
 
 echo "EDGENET_ASK_CONFIRMATION=${EDGENET_ASK_CONFIRMATION}"
+echo "EDGENET_BRANCH=${EDGENET_BRANCH}"
 echo "EDGENET_KUBECONFIG=${EDGENET_KUBECONFIG}"
 echo "EDGENET_PLAYBOOK=${EDGENET_PLAYBOOK}"
 echo "EDGENET_REPOSITORY=${EDGENET_REPOSITORY}"
@@ -106,8 +110,8 @@ esac
 if [ "${EDGENET_REPOSITORY}" != "." ]; then
   LOCAL_REPOSITORY=$(mktemp -d)
   echo "Cloning ${EDGENET_REPOSITORY} to ${LOCAL_REPOSITORY}..."
-  git clone --depth 1 --quiet --recursive ${GIT_EXTRA_OPTS} \
-    "${EDGENET_REPOSITORY}" "${LOCAL_REPOSITORY}"
+  git clone --depth 1 --quiet --recursive --single-branch --branch "${EDGENET_BRANCH}" \
+    ${GIT_EXTRA_OPTS} "${EDGENET_REPOSITORY}" "${LOCAL_REPOSITORY}"
 else
   LOCAL_REPOSITORY="${EDGENET_REPOSITORY}"
 fi
