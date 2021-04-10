@@ -15,7 +15,12 @@ dev="unknown"   # Interface name
 intip="unknown" # Internal IP
 pubip="unknown" # Public IP
 
-if aws >/dev/null; then
+if az >/dev/null; then
+  intip=$(az network/interface/0/ipv4/ipAddress/0/privateIpAddress)
+  # The NIC public IP is not available through Azure metadata...
+  # https://docs.microsoft.com/en-us/answers/questions/7932/public-ip-not-available-via-metadata.html
+  pubip=$(pubip)
+elif aws >/dev/null; then
   intip=$(aws local-ipv4)
   pubip=$(aws public-ipv4)
 elif gcp >/dev/null; then

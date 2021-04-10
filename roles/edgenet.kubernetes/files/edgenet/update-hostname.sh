@@ -8,7 +8,10 @@ set -eux
 if [ ! -f /opt/edgenet/hostname ]; then
   hash=$(rand 'a-f0-9' 4)
 
-  if aws >/dev/null; then
+  if az >/dev/null; then
+    region=$(az compute/location)
+    hostname="az-${region}-${hash}"
+  elif aws >/dev/null; then
     region=$(aws placement/availability-zone)
     hostname="aws-${region}-${hash}"
   elif gcp >/dev/null; then

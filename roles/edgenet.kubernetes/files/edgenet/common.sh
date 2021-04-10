@@ -2,7 +2,7 @@
 # vim: et sw=2 ts=2
 
 # NOTE: curl on CentOS 7 doesn't support fractional values for --max-time.
-# NOTE: We use a max-time of 2 seconds since some API take some time to reply.
+# NOTE: We use a max-time of 2 seconds since some APIs take some time to reply.
 get() {
   curl --ipv4 --fail --max-time 2 --noproxy --silent --show-error \
     --header "Metadata: true" \
@@ -12,7 +12,7 @@ get() {
 
 # Query Azure instance metadata
 az() {
-  get "http://169.254.169.254/metadata/instance"
+  get "http://169.254.169.254/metadata/instance/${1-}?api-version=2020-09-01&format=text"
 }
 
 # Query AWS EC2 instance metadata
