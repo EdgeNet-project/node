@@ -20,6 +20,8 @@ if [ ! -f /opt/edgenet/hostname ]; then
   elif scw >/dev/null; then
     region=$(scw LOCATION_ZONE_ID)
     hostname="scw-${region}-${hash}"
+  elif nuc >/dev/null; then
+    hostname="nuc-$(geoip)-${hash}"
   else
     hostname="$(geoip)-${hash}"
   fi

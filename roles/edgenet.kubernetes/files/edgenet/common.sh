@@ -35,6 +35,11 @@ scw() {
   return $status
 }
 
+# Check if the machine is an Intel NUC
+nuc() {
+  dmidecode -s system-family | grep -i "Intel NUC"
+}
+
 # Return the country and the region inferred from the IP address
 geoip() {
   resp=$(get "https://freegeoip.app/csv/")
