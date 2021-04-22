@@ -21,6 +21,13 @@ EDGENET_REPOSITORY="${EDGENET_REPOSITORY:-https://github.com/EdgeNet-project/nod
 # Whether to start or not the EdgeNet service (useful for Cloud/VM images).
 EDGENET_SERVICE_START="${EDGENET_SERVICE_START:-1}"
 
+# If the shell is non-interactive, do not ask for confirmation.
+# See https://www.gnu.org/software/bash/manual/html_node/Is-this-Shell-Interactive_003f.html.
+case "$-" in
+  *i*) ;;
+  *) EDGENET_ASK_CONFIRMATION=0 ;;
+esac
+
 echo -e "\033[1mWelcome to EdgeNet! (https://edge-net.org/)\033[0m"
 echo -e "This script will install Ansible, and download and run the EdgeNet node playbook."
 echo -e "In case of problem, contact \033[1medgenet-support@planet-lab.eu\033[0m."
