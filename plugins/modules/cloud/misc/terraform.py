@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: terraform
 short_description: Manages a Terraform deployment (and plans)
@@ -33,6 +33,19 @@ options:
         vars.tf/main.tf/etc to use.
     type: path
     required: true
+  plugin_paths:
+    description:
+      - List of paths containing Terraform plugin executable files.
+      - Plugin executables can be downloaded from U(https://releases.hashicorp.com/).
+      - When set, the plugin discovery and auto-download behavior of Terraform is disabled.
+      - The directory structure in the plugin path can be tricky. The Terraform docs
+        U(https://learn.hashicorp.com/tutorials/terraform/automate-terraform#pre-installed-plugins)
+        show a simple directory of files, but actually, the directory structure
+        has to follow the same structure you would see if Terraform auto-downloaded the plugins.
+        See the examples below for a tree output of an example plugin directory.
+    type: list
+    elements: path
+    version_added: 3.0.0
   workspace:
     description:
       - The terraform workspace to work with.
@@ -141,6 +154,28 @@ EXAMPLES = """
     backend_config_files:
       - /path/to/backend_config_file_1
       - /path/to/backend_config_file_2
+
+- name: Disable plugin discovery and auto-download by setting plugin_paths
+  community.general.terraform:
+    project_path: 'project/'
+    state: "{{ state }}"
+    force_init: true
+    plugin_paths:
+      - /path/to/plugins_dir_1
+      - /path/to/plugins_dir_2
+
+### Example directory structure for plugin_paths example
+# $ tree /path/to/plugins_dir_1
+# /path/to/plugins_dir_1/
+# └── registry.terraform.io
+#     └── hashicorp
+#         └── vsphere
+#             ├── 1.24.0
+#             │   └── linux_amd64
+#             │       └── terraform-provider-vsphere_v1.24.0_x4
+#             └── 1.26.0
+#                 └── linux_amd64
+#                     └── terraform-provider-vsphere_v1.26.0_x4
 """
 
 RETURN = """
@@ -177,24 +212,31 @@ command:
 import os
 import json
 import tempfile
+from distutils.version import LooseVersion
 from ansible.module_utils.six.moves import shlex_quote
 
 from ansible.module_utils.basic import AnsibleModule
 
-DESTROY_ARGS = ('destroy', '-no-color', '-force')
-APPLY_ARGS = ('apply', '-no-color', '-input=false', '-auto-approve=true')
 module = None
 
 
-def preflight_validation(bin_path, project_path, variables_args=None, plan_file=None):
+def get_version(bin_path):
+    extract_version = module.run_command([bin_path, 'version', '-json'])
+    terraform_version = (json.loads(extract_version[1]))['terraform_version']
+    return terraform_version
+
+
+def preflight_validation(bin_path, project_path, version, variables_args=None, plan_file=None):
     if project_path in [None, ''] or '/' not in project_path:
         module.fail_json(msg="Path for Terraform project can not be None or ''.")
     if not os.path.exists(bin_path):
         module.fail_json(msg="Path for Terraform binary '{0}' doesn't exist on this host - check the path and try again please.".format(bin_path))
     if not os.path.isdir(project_path):
         module.fail_json(msg="Path for Terraform project '{0}' doesn't exist on this host - check the path and try again please.".format(project_path))
-
-    rc, out, err = module.run_command([bin_path, 'validate'] + variables_args, check_rc=True, cwd=project_path, use_unsafe_shell=True)
+    if LooseVersion(version) < LooseVersion('0.15.0'):
+        rc, out, err = module.run_command([bin_path, 'validate'] + variables_args, check_rc=True, cwd=project_path)
+    else:
+        rc, out, err = module.run_command([bin_path, 'validate'], check_rc=True, cwd=project_path)
 
 
 def _state_args(state_file):
@@ -205,7 +247,7 @@ def _state_args(state_file):
     return []
 
 
-def init_plugins(bin_path, project_path, backend_config, backend_config_files, init_reconfigure):
+def init_plugins(bin_path, project_path, backend_config, backend_config_files, init_reconfigure, plugin_paths):
     command = [bin_path, 'init', '-input=false']
     if backend_config:
         for key, val in backend_config.items():
@@ -218,6 +260,9 @@ def init_plugins(bin_path, project_path, backend_config, backend_config_files, i
             command.extend(['-backend-config', f])
     if init_reconfigure:
         command.extend(['-reconfigure'])
+    if plugin_paths:
+        for plugin_path in plugin_paths:
+            command.extend(['-plugin-dir', plugin_path])
     rc, out, err = module.run_command(command, check_rc=True, cwd=project_path)
 
 
@@ -267,7 +312,7 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
 
     plan_command.extend(_state_args(state_file))
 
-    rc, out, err = module.run_command(plan_command + variables_args, cwd=project_path, use_unsafe_shell=True)
+    rc, out, err = module.run_command(plan_command + variables_args, cwd=project_path)
 
     if rc == 0:
         # no changes
@@ -288,6 +333,7 @@ def main():
         argument_spec=dict(
             project_path=dict(required=True, type='path'),
             binary_path=dict(type='path'),
+            plugin_paths=dict(type='list', elements='path'),
             workspace=dict(required=False, type='str', default='default'),
             purge_workspace=dict(type='bool', default=False),
             state=dict(default='present', choices=['present', 'absent', 'planned']),
@@ -309,6 +355,7 @@ def main():
 
     project_path = module.params.get('project_path')
     bin_path = module.params.get('binary_path')
+    plugin_paths = module.params.get('plugin_paths')
     workspace = module.params.get('workspace')
     purge_workspace = module.params.get('purge_workspace')
     state = module.params.get('state')
@@ -326,8 +373,17 @@ def main():
     else:
         command = [module.get_bin_path('terraform', required=True)]
 
+    checked_version = get_version(command[0])
+
+    if LooseVersion(checked_version) < LooseVersion('0.15.0'):
+        DESTROY_ARGS = ('destroy', '-no-color', '-force')
+        APPLY_ARGS = ('apply', '-no-color', '-input=false', '-auto-approve=true')
+    else:
+        DESTROY_ARGS = ('destroy', '-no-color', '-auto-approve')
+        APPLY_ARGS = ('apply', '-no-color', '-input=false', '-auto-approve')
+
     if force_init:
-        init_plugins(command[0], project_path, backend_config, backend_config_files, init_reconfigure)
+        init_plugins(command[0], project_path, backend_config, backend_config_files, init_reconfigure, plugin_paths)
 
     workspace_ctx = get_workspace_context(command[0], project_path)
     if workspace_ctx["current"] != workspace:
@@ -351,7 +407,7 @@ def main():
         for f in variables_files:
             variables_args.extend(['-var-file', f])
 
-    preflight_validation(command[0], project_path, variables_args)
+    preflight_validation(command[0], project_path, checked_version, variables_args)
 
     if module.params.get('lock') is not None:
         if module.params.get('lock'):
