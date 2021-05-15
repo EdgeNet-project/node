@@ -17,7 +17,7 @@ short_description: Add or remove LDAP entries.
 description:
   - Add or remove LDAP entries. This module only asserts the existence or
     non-existence of an LDAP entry, not its attributes. To assert the
-    attribute values of an entry, see M(community.general.ldap_attr).
+    attribute values of an entry, see M(community.general.ldap_attrs).
 notes:
   - The default authentication settings will attempt to use a SASL EXTERNAL
     bind over a UNIX domain socket. This works well with the default Ubuntu
@@ -25,9 +25,6 @@ notes:
     rule allowing root to modify the server configuration. If you need to use
     a simple bind to access your server, pass the credentials in I(bind_dn)
     and I(bind_pw).
-  - "The I(params) parameter was removed due to circumventing Ansible's parameter
-     handling.  The I(params) parameter started disallowing setting the I(bind_pw) parameter in
-     Ansible-2.7 as it was insecure to set the parameter that way."
 author:
   - Jiri Tyr (@jtyr)
 requirements:
@@ -37,7 +34,7 @@ options:
     description:
       - If I(state=present), attributes necessary to create an entry. Existing
         entries are never modified. To assert specific attribute values on an
-        existing entry, use M(community.general.ldap_attr) module instead.
+        existing entry, use M(community.general.ldap_attrs) module instead.
     type: dict
   objectClass:
     description:
@@ -51,6 +48,7 @@ options:
       - The target state of the entry.
     choices: [present, absent]
     default: present
+    type: str
 extends_documentation_fragment:
 - community.general.ldap.documentation
 
@@ -187,7 +185,6 @@ def main():
         argument_spec=gen_specs(
             attributes=dict(default={}, type='dict'),
             objectClass=dict(type='list', elements='str'),
-            params=dict(type='dict'),
             state=dict(default='present', choices=['present', 'absent']),
         ),
         required_if=[('state', 'present', ['objectClass'])],
@@ -197,9 +194,6 @@ def main():
     if not HAS_LDAP:
         module.fail_json(msg=missing_required_lib('python-ldap'),
                          exception=LDAP_IMP_ERR)
-
-    if module.params['params']:
-        module.fail_json(msg="The `params` option to ldap_attr was removed since it circumvents Ansible's option handling")
 
     state = module.params['state']
 

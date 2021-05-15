@@ -184,6 +184,7 @@ TESTCASE_BRIDGE = [
         'ifname': 'br0_non_existant',
         'ip4': '10.10.10.10/24',
         'gw4': '10.10.10.1',
+        'mac': '52:54:00:ab:cd:ef',
         'maxage': 100,
         'stp': True,
         'state': 'present',
@@ -200,6 +201,7 @@ ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
 ipv4.never-default:                     no
 ipv6.method:                            auto
+bridge.mac-address:                     52:54:00:AB:CD:EF
 bridge.stp:                             yes
 bridge.max-age:                         100
 bridge.ageing-time:                     300
@@ -223,6 +225,7 @@ TESTCASE_BRIDGE_SLAVE_SHOW_OUTPUT = """\
 connection.id:                          non_existent_nw_device
 connection.interface-name:              br0_non_existant
 connection.autoconnect:                 yes
+connection.slave-type:                  bridge
 ipv4.never-default:                     no
 bridge-port.path-cost:                  100
 bridge-port.hairpin-mode:               yes

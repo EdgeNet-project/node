@@ -54,7 +54,7 @@ options:
             - Type C(generic) is added in Ansible 2.5.
             - Type C(infiniband) is added in community.general 2.0.0.
         type: str
-        choices: [ bond, bond-slave, bridge, bridge-slave, ethernet, generic, infiniband, ipip, sit, team, team-slave, vlan, vxlan ]
+        choices: [ bond, bond-slave, bridge, bridge-slave, ethernet, generic, infiniband, ipip, sit, team, team-slave, vlan, vxlan, wifi ]
     mode:
         description:
             - This is the type of device or network connection that you wish to create for a bond, team or bridge.
@@ -210,7 +210,7 @@ options:
         default: 300
     mac:
         description:
-            - This is only used with bridge - MAC address of the bridge.
+            - MAC address of the connection.
             - Note this requires a recent kernel feature, originally introduced in 3.15 upstream kernel.
         type: str
     slavepriority:
@@ -279,6 +279,19 @@ options:
             - When updating this property on a currently activated connection, the change takes effect immediately.
        type: str
        version_added: 2.0.0
+    wifi_sec:
+       description:
+            - 'The security configuration of the Wifi connection. The valid attributes are listed on:'
+            - 'U(https://developer.gnome.org/NetworkManager/stable/settings-802-11-wireless-security.html)'
+            - 'For instance to use common WPA-PSK auth with a password:'
+            - '- C({key-mgmt: wpa-psk, psk: my_password})'
+       type: dict
+       version_added: 3.0.0
+    ssid:
+       description:
+            - Name of the Wireless router or the access point.
+       type: str
+       version_added: 3.0.0
 '''
 
 EXAMPLES = r'''
@@ -582,6 +595,19 @@ EXAMPLES = r'''
 #     - 8 NetworkManager is not running
 #     - 9 nmcli and NetworkManager versions mismatch
 #     - 10 Connection, device, or access point does not exist.
+
+- name: Create the wifi connection
+  community.general.nmcli:
+    type: wifi
+    conn_name: Brittany
+    ifname: wlp4s0
+    ssid: Brittany
+    wifi_sec:
+      key-mgmt: wpa-psk
+      psk: my_password
+    autoconnect: true
+    state: present
+
 '''
 
 RETURN = r"""#
@@ -665,6 +691,8 @@ class Nmcli(object):
         self.nmcli_bin = self.module.get_bin_path('nmcli', True)
         self.dhcp_client_id = module.params['dhcp_client_id']
         self.zone = module.params['zone']
+        self.ssid = module.params['ssid']
+        self.wifi_sec = module.params['wifi_sec']
 
         if self.method4:
             self.ipv4_method = self.method4
@@ -695,7 +723,7 @@ class Nmcli(object):
         }
 
         # IP address options.
-        if self.ip_conn_type:
+        if self.ip_conn_type and not self.master:
             options.update({
                 'ipv4.addresses': self.ip4,
                 'ipv4.dhcp-client-id': self.dhcp_client_id,
@@ -714,7 +742,7 @@ class Nmcli(object):
             })
 
         # Layer 2 options.
-        if self.mac_conn_type:
+        if self.mac:
             options.update({self.mac_setting: self.mac})
 
         if self.mtu_conn_type:
@@ -752,6 +780,7 @@ class Nmcli(object):
             })
         elif self.type == 'bridge-slave':
             options.update({
+                'connection.slave-type': 'bridge',
                 'bridge-port.path-cost': self.path_cost,
                 'bridge-port.hairpin-mode': self.hairpin,
                 'bridge-port.priority': self.slavepriority,
@@ -774,7 +803,10 @@ class Nmcli(object):
                 'vxlan.local': self.vxlan_local,
                 'vxlan.remote': self.vxlan_remote,
             })
-
+        elif self.type == 'wifi':
+            options.update({
+                'connection.slave-type': 'bond' if self.master else None,
+            })
         # Convert settings values based on the situation.
         for setting, value in options.items():
             setting_type = self.settings_type(setting)
@@ -808,11 +840,8 @@ class Nmcli(object):
             'infiniband',
             'team',
             'vlan',
+            'wifi'
         )
-
-    @property
-    def mac_conn_type(self):
-        return self.type == 'bridge'
 
     @property
     def mac_setting(self):
@@ -845,6 +874,7 @@ class Nmcli(object):
             'bond-slave',
             'bridge-slave',
             'team-slave',
+            'wifi',
         )
 
     @property
@@ -919,6 +949,13 @@ class Nmcli(object):
         else:
             ifname = self.ifname
 
+        if self.type == "wifi":
+            cmd.append('ssid')
+            cmd.append(self.ssid)
+            if self.wifi_sec:
+                for name, value in self.wifi_sec.items():
+                    cmd += ['wifi-sec.%s' % name, value]
+
         options = {
             'connection.interface-name': ifname,
         }
@@ -940,7 +977,7 @@ class Nmcli(object):
 
     @property
     def create_connection_up(self):
-        if self.type in ('bond', 'ethernet', 'infiniband'):
+        if self.type in ('bond', 'ethernet', 'infiniband', 'wifi'):
             if (self.mtu is not None) or (self.dns4 is not None) or (self.dns6 is not None):
                 return True
         elif self.type == 'team':
@@ -999,18 +1036,6 @@ class Nmcli(object):
         return conn_info
 
     def _compare_conn_params(self, conn_info, options):
-        # See nmcli(1) for details
-        param_alias = {
-            'type': 'connection.type',
-            'con-name': 'connection.id',
-            'autoconnect': 'connection.autoconnect',
-            'ifname': 'connection.interface-name',
-            'mac': self.mac_setting,
-            'master': 'connection.master',
-            'slave-type': 'connection.slave-type',
-            'zone': 'connection.zone',
-        }
-
         changed = False
         diff_before = dict()
         diff_after = dict()
@@ -1029,13 +1054,11 @@ class Nmcli(object):
                     current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+),\s*mt\s*=\s*([^} ]+)\s*}', r'\1 \2 \3',
                                      route) for route in current_value]
                     current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+)\s*}', r'\1 \2', route) for route in current_value]
-            elif key in param_alias:
-                real_key = param_alias[key]
-                if real_key in conn_info:
-                    current_value = conn_info[real_key]
-                else:
-                    # alias parameter does not exist
-                    current_value = None
+                if key == self.mac_setting:
+                    # MAC addresses are case insensitive, nmcli always reports them in uppercase
+                    value = value.upper()
+                    # ensure current_value is also converted to uppercase in case nmcli changes behaviour
+                    current_value = current_value.upper()
             else:
                 # parameter does not exist
                 current_value = None
@@ -1088,7 +1111,8 @@ def main():
                           'team',
                           'team-slave',
                           'vlan',
-                          'vxlan'
+                          'vxlan',
+                          'wifi',
                       ]),
             ip4=dict(type='str'),
             gw4=dict(type='str'),
@@ -1141,8 +1165,11 @@ def main():
             ip_tunnel_dev=dict(type='str'),
             ip_tunnel_local=dict(type='str'),
             ip_tunnel_remote=dict(type='str'),
+            ssid=dict(type='str'),
+            wifi_sec=dict(type='dict', no_log=True),
         ),
         mutually_exclusive=[['never_default4', 'gw4']],
+        required_if=[("type", "wifi", [("ssid")])],
         supports_check_mode=True,
     )
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')

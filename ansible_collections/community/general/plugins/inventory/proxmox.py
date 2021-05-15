@@ -70,6 +70,13 @@ DOCUMENTATION = '''
         description: Gather LXC/QEMU configuration facts.
         default: no
         type: bool
+      want_proxmox_nodes_ansible_host:
+        version_added: 3.0.0
+        description:
+          - Whether to set C(ansbile_host) for proxmox nodes.
+          - When set to C(true) (default), will use the first available interface. This can be different from what you expect.
+        default: true
+        type: bool
       strict:
         version_added: 2.5.0
       compose:
@@ -224,6 +231,38 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             except Exception:
                 return None
 
+    def _get_agent_network_interfaces(self, node, vmid, vmtype):
+        result = []
+
+        try:
+            ifaces = self._get_json(
+                "%s/api2/json/nodes/%s/%s/%s/agent/network-get-interfaces" % (
+                    self.proxmox_url, node, vmtype, vmid
+                )
+            )['result']
+
+            if "error" in ifaces:
+                if "class" in ifaces["error"]:
+                    # This happens on Windows, even though qemu agent is running, the IP address
+                    # cannot be fetched, as it's unsupported, also a command disabled can happen.
+                    errorClass = ifaces["error"]["class"]
+                    if errorClass in ["Unsupported"]:
+                        self.display.v("Retrieving network interfaces from guest agents on windows with older qemu-guest-agents is not supported")
+                    elif errorClass in ["CommandDisabled"]:
+                        self.display.v("Retrieving network interfaces from guest agents has been disabled")
+                return result
+
+            for iface in ifaces:
+                result.append({
+                    'name': iface['name'],
+                    'mac-address': iface['hardware-address'] if 'hardware-address' in iface else '',
+                    'ip-addresses': ["%s/%s" % (ip['ip-address'], ip['prefix']) for ip in iface['ip-addresses']] if 'ip-addresses' in iface else []
+                })
+        except requests.HTTPError:
+            pass
+
+        return result
+
     def _get_vm_config(self, node, vmid, vmtype, name):
         ret = self._get_json("%s/api2/json/nodes/%s/%s/%s/config" % (self.proxmox_url, node, vmtype, vmid))
 
@@ -257,6 +296,14 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     parsed_key = self.to_safe('%s%s' % (key, "_parsed"))
                     parsed_value = [tag.strip() for tag in value.split(",")]
                     self.inventory.set_variable(name, parsed_key, parsed_value)
+
+                # The first field in the agent string tells you whether the agent is enabled
+                # the rest of the comma separated string is extra config for the agent
+                if config == 'agent' and int(value.split(',')[0]):
+                    agent_iface_key = self.to_safe('%s%s' % (key, "_interfaces"))
+                    agent_iface_value = self._get_agent_network_interfaces(node, vmid, vmtype)
+                    if agent_iface_value:
+                        self.inventory.set_variable(name, agent_iface_key, agent_iface_value)
 
                 if not (isinstance(value, int) or ',' not in value):
                     # split off strings with commas to a dict
@@ -323,8 +370,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     self.inventory.add_child(nodes_group, node['node'])
 
                 # get node IP address
-                ip = self._get_node_ip(node['node'])
-                self.inventory.set_variable(node['node'], 'ansible_host', ip)
+                if self.get_option("want_proxmox_nodes_ansible_host"):
+                    ip = self._get_node_ip(node['node'])
+                    self.inventory.set_variable(node['node'], 'ansible_host', ip)
 
                 # get LXC containers for this node
                 node_lxc_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), ('%s_lxc' % node['node']).lower()))
