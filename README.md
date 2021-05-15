@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="/assets/edgenet_logo_2020_05_03_w_text_075dpi.png" height="130"><br/><br/>
+  <img src="https://github.com/EdgeNet-project/edgenet/blob/master/assets/logos/edgenet_logos_2020_05_03/edgenet_logo_2020_05_03_w_text_075dpi.png" height="130"><br/><br/>
   <i>The globally distributed edge cloud for Internet researchers.</i>
 </p>
 
