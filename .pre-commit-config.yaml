@@ -1,4 +1,4 @@
-exclude: ^roles/geerlingguy.*$
+exclude: ^(ansible_collections)|(roles/geerlingguy).*$
 
 repos:
 - repo: https://github.com/ansible-community/ansible-lint.git
