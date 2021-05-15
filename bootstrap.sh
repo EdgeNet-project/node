@@ -3,6 +3,9 @@
 # vim: et sw=2 ts=2
 set -eu
 
+# To override one of these settings, set the appropriate environment variable.
+# For example: `export EDGENET_ASK_CONFIRMATION=0`.
+
 # Whether to ask to continue or not.
 EDGENET_ASK_CONFIRMATION="${EDGENET_ASK_CONFIRMATION:-1}"
 
@@ -13,13 +16,10 @@ EDGENET_BRANCH="${EDGENET_BRANCH:-main}"
 EDGENET_KUBECONFIG="${EDGENET_KUBECONFIG:-https://raw.githubusercontent.com/EdgeNet-project/edgenet/master/configs/public.cfg}"
 
 # Name of the playbook to run.
-EDGENET_PLAYBOOK="${EDGENET_PLAYBOOK:-edgenet-node-full.yml}"
+EDGENET_PLAYBOOK="${EDGENET_PLAYBOOK:-edgenet-node.yml}"
 
 # URL of the Git repository containing the playbook to run.
 EDGENET_REPOSITORY="${EDGENET_REPOSITORY:-https://github.com/EdgeNet-project/node.git}"
-
-# Whether to start or not the EdgeNet service (useful for Cloud/VM images).
-EDGENET_SERVICE_START="${EDGENET_SERVICE_START:-1}"
 
 # If the shell is non-interactive, do not ask for confirmation.
 # See https://www.gnu.org/software/bash/manual/html_node/Is-this-Shell-Interactive_003f.html.
@@ -32,17 +32,6 @@ echo -e "\033[1mWelcome to EdgeNet! (https://edge-net.org/)\033[0m"
 echo -e "This script will install Ansible, and download and run the EdgeNet node playbook."
 echo -e "In case of problem, contact \033[1medgenet-support@planet-lab.eu\033[0m."
 echo
-
-echo "EDGENET_ASK_CONFIRMATION=${EDGENET_ASK_CONFIRMATION}"
-echo "EDGENET_BRANCH=${EDGENET_BRANCH}"
-echo "EDGENET_KUBECONFIG=${EDGENET_KUBECONFIG}"
-echo "EDGENET_PLAYBOOK=${EDGENET_PLAYBOOK}"
-echo "EDGENET_REPOSITORY=${EDGENET_REPOSITORY}"
-echo "EDGENET_SERVICE_START=${EDGENET_SERVICE_START}"
-
-echo
-echo "To change these values, set the appropriate environement variable."
-echo "For example: 'export EDGENET_ASK_CONFIRMATION=0'."
 echo -e "\033[1mPress Enter to continue, or CTRL+C to exit...\033[0m"
 [ "${EDGENET_ASK_CONFIRMATION}" -eq 1 ] && read -r _
 
@@ -62,7 +51,7 @@ if [ -f /etc/os-release ]; then
   . /etc/os-release
 fi
 
-# Run sudo once to avoid asking for the password later
+# Run sudo once to avoid asking for the password later.
 ${SUDO} true
 
 # Install Ansible and git if not present.
@@ -119,17 +108,10 @@ else
   LOCAL_REPOSITORY="${EDGENET_REPOSITORY}"
 fi
 
-# Populate the `edgenet_service_state` variable.
-edgenet_service_state="stopped"
-if [ "${EDGENET_SERVICE_START}" -eq 1 ]; then
-  edgenet_service_state="restarted"
-fi
-
 # Run the node playbook.
 export ANSIBLE_COLLECTIONS_PATHS="${LOCAL_REPOSITORY}"
 ansible-playbook --connection local \
   --extra-vars "ansible_python_interpreter=${PYTHON}" \
-  --extra-vars "edgenet_service_state=${edgenet_service_state}" \
   --extra-vars "edgenet_kubeconfig_url=${EDGENET_KUBECONFIG}" \
   --inventory "localhost," \
   "${LOCAL_REPOSITORY}/${EDGENET_PLAYBOOK}"
