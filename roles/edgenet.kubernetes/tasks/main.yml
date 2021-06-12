@@ -1,4 +1,14 @@
 ---
+- name: Disable swap (boot)
+  replace:
+    path: /etc/fstab
+    regexp: '^\s*[^#](.+swap\s+swap.+)$'
+    replace: '# \1'
+    backup: true
+
+- name: Disable swap (session)
+  command: swapoff -a
+
 - name: Install EdgeNet files
   copy:
     src: edgenet/
@@ -10,30 +20,6 @@
     src: edgenet.service
     dest: /etc/systemd/system/edgenet.service
     mode: "0644"
-
-- name: Download kubeconfig file
-  get_url:
-    url: "{{ edgenet_kubeconfig_url }}"
-    dest: /opt/edgenet/public.cfg
-    mode: "0644"
-
-- name: Install network utilities
-  package:
-    name:
-      - ipset
-      - iptables
-      - net-tools
-    state: present
-
-- name: Disable swap (boot)
-  replace:
-    path: /etc/fstab
-    regexp: '^\s*[^#](.+swap\s+swap.+)$'
-    replace: '# \1'
-    backup: true
-
-- name: Disable swap (session)
-  command: swapoff -a
 
 - name: Install containerd
   include_tasks: containerd.yml
