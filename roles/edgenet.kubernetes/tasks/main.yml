@@ -7,7 +7,7 @@
 
 - name: Install EdgeNet service
   copy:
-    src: systemd/edgenet.service
+    src: edgenet.service
     dest: /etc/systemd/system/edgenet.service
     mode: "0644"
 
@@ -17,17 +17,7 @@
     dest: /opt/edgenet/public.cfg
     mode: "0644"
 
-- name: Disable swap
-  command: swapoff -a
-
-- name: Disable swap in /etc/fstab
-  replace:
-    path: /etc/fstab
-    regexp: '^\s*[^#](.+swap\s+swap.+)$'
-    replace: '# \1'
-    backup: true
-
-- name: Install required network utilities
+- name: Install network utilities
   package:
     name:
       - ipset
@@ -35,44 +25,21 @@
       - net-tools
     state: present
 
-- name: Install Docker (Debian x86-64)
-  import_role:
-    name: geerlingguy.docker
-  vars:
-    containerd_apt_arch: amd64
-    docker_install_compose: false
-    docker_package: "docker-ce=5:{{ edgenet_docker_version }}*"
-  when:
-    - ansible_os_family == 'Debian'
-    - ansible_architecture == 'x86_64'
+- name: Disable swap (boot)
+  replace:
+    path: /etc/fstab
+    regexp: '^\s*[^#](.+swap\s+swap.+)$'
+    replace: '# \1'
+    backup: true
 
-- name: Install Docker (Debian ARM64)
-  import_role:
-    name: geerlingguy.docker
-  vars:
-    containerd_apt_arch: arm64
-    docker_install_compose: false
-    docker_package: "docker-ce=5:{{ edgenet_docker_version }}*"
-  when:
-    - ansible_os_family == 'Debian'
-    - ansible_architecture == 'aarch64'
+- name: Disable swap (session)
+  command: swapoff -a
 
-- name: Install Docker (RedHat)
-  import_role:
-    name: geerlingguy.docker
-  vars:
-    docker_install_compose: false
-    docker_package: "docker-ce-3:{{ edgenet_docker_version }}*"
-  when: ansible_os_family == 'RedHat'
+- name: Install containerd
+  include_tasks: containerd.yml
 
 - name: Install Kubernetes
   include_tasks: kube.yml
-
-- name: Configure Docker
-  copy:
-    src: docker/daemon.json
-    dest: /etc/docker/daemon.json
-    mode: "0644"
 
 - name: Ensures NetworkManager conf.d exists
   file:
@@ -82,12 +49,27 @@
 
 - name: Configure NetworkManager
   copy:
-    src: NetworkManager/calico.conf
+    src: NetworkManager-calico.conf
     dest: /etc/NetworkManager/conf.d/calico.conf
     mode: "0644"
 
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#letting-iptables-see-bridged-traffic
 # https://kubernetes.io/docs/setup/production-environment/container-runtimes/
+- name: Load kernel modules (boot)
+  copy:
+    src: modules-k8s.conf
+    dest: /etc/modules-load.d/k8s.conf
+    mode: "0644"
+
+- name: Load kernel modules (session)
+  community.general.modprobe:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - br_netfilter
+    - ip_conntrack
+    - overlay
+
 - name: Let iptables see bridged traffic
   sysctl:
     name: "{{ item }}"
@@ -105,23 +87,8 @@
     value: "1000000"
     state: present
 
-# This is necessary since we have changed the daemon configuration
-- name: Restart Docker
-  systemd:
-    name: docker
-    enabled: yes
-    state: restarted
-
-- name: Enable EdgeNet service
+- name: "Enable EdgeNet service (state={{ edgenet_service_state }})"
   systemd:
     name: edgenet
-    enabled: yes
     state: "{{ edgenet_service_state }}"
-
-# Enable huge pages (Calico VPP requirement)
-# NOTE: Disabled for now as it conflicts with postgres.
-# - name: Enable Huge Pages
-#   sysctl:
-#     name: vm.nr_hugepages
-#     value: "128"
-#     state: present
+    enabled: yes

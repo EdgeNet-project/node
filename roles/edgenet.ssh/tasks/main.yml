@@ -45,7 +45,7 @@
     - "Port 22"
     - "Port {{ edgenet_ssh_port_alt }}"
 
-- name: Enable the SSH server
+- name: Enable the SSH server (state=reloaded)
   systemd:
     name: sshd
     enabled: yes
