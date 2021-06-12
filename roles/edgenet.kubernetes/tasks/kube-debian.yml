@@ -18,7 +18,6 @@
   apt_repository:
     repo: "{{ kubernetes_apt_repository }}"
     state: present
-    update_cache: true
 
 - name: Pin Kubernetes version in APT preferences
   template:
@@ -33,3 +32,4 @@
       - kubectl
       - kubelet
     state: present
+    update_cache: true
