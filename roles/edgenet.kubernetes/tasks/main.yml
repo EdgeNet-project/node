@@ -8,6 +8,7 @@
 
 - name: Disable swap (session)
   command: swapoff -a
+  tags: ['skip_ansible_lint']
 
 - name: Install EdgeNet files
   copy:
@@ -77,4 +78,4 @@
   systemd:
     name: edgenet
     state: "{{ edgenet_service_state }}"
-    enabled: yes
+    enabled: true

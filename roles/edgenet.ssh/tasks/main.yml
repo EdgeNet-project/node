@@ -26,8 +26,8 @@
     name: "{{ edgenet_ssh_user }}"
     shell: /bin/bash
     groups: wheel
-    append: yes
-    createhome: yes
+    append: true
+    createhome: true
     comment: EdgeNet (edge-net.org)
 
 - name: Install the EdgeNet public SSH key
@@ -48,5 +48,5 @@
 - name: Enable the SSH server (state=reloaded)
   systemd:
     name: sshd
-    enabled: yes
+    enabled: true
     state: reloaded
