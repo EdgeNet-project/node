@@ -28,8 +28,11 @@
 - name: Install Kubernetes packages
   apt:
     name:
-      - kubeadm
-      - kubectl
-      - kubelet
+      - "kubeadm={{ kubernetes_version }}*"
+      - "kubectl={{ kubernetes_version }}*"
+      - "kubelet={{ kubernetes_version }}*"
     state: present
     update_cache: true
+    # TODO: Remove `force: true` when the following PR will be merged:
+    # https://github.com/ansible/ansible/pull/74852
+    force: true

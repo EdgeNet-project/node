@@ -18,10 +18,14 @@
     mode: "0644"
 
 - name: Disable swap
-  import_role:
-    name: geerlingguy.swap
-  vars:
-    swap_file_state: absent
+  command: swapoff -a
+
+- name: Disable swap in /etc/fstab
+  replace:
+    path: /etc/fstab
+    regexp: '^(.+swap\s+swap.+)$'
+    replace: '# \1'
+    backup: true
 
 - name: Install required network utilities
   package:
