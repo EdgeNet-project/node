@@ -7,11 +7,12 @@
     name:
       - apt-transport-https
       - ca-certificates
+      - gnupg2
     state: present
 
 - name: Add Kubernetes APT GPG key
   get_url:
-    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    url: "{{ kubernetes_apt_gpg_key }}"
     dest: /usr/share/keyrings/kubernetes-archive-keyring.gpg
 
 - name: Add Kubernetes APT repository

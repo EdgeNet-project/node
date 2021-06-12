@@ -24,7 +24,7 @@
   replace:
     path: /etc/fstab
     regexp: '^\s*[^#](.+swap\s+swap.+)$'
-    replace: '#\1'
+    replace: '# \1'
     backup: true
 
 - name: Install required network utilities
@@ -39,7 +39,7 @@
   import_role:
     name: geerlingguy.docker
   vars:
-    docker_apt_arch: amd64
+    containerd_apt_arch: amd64
     docker_install_compose: false
     docker_package: "docker-ce=5:{{ edgenet_docker_version }}*"
   when:
@@ -50,7 +50,7 @@
   import_role:
     name: geerlingguy.docker
   vars:
-    docker_apt_arch: arm64
+    containerd_apt_arch: arm64
     docker_install_compose: false
     docker_package: "docker-ce=5:{{ edgenet_docker_version }}*"
   when:
