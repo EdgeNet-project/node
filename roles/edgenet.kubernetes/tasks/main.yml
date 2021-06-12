@@ -23,8 +23,8 @@
 - name: Disable swap in /etc/fstab
   replace:
     path: /etc/fstab
-    regexp: '^\s*[^#](.+swap\s+swap.+)$'
-    replace: '# \1'
+    regexp: '^\s*#?(.+swap\s+swap.+)$'
+    replace: '#\1'
     backup: true
 
 - name: Install required network utilities
