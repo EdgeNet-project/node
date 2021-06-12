@@ -1,0 +1,35 @@
+---
+# Simplified version of
+# - https://github.com/geerlingguy/ansible-role-kubernetes (MIT)
+# - https://github.com/geerlingguy/ansible-role-kubernetes/issues/105
+- name: Ensure APT dependencies are installed
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+    state: present
+
+- name: Add Kubernetes APT GPG key
+  get_url:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    dest: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+
+- name: Add Kubernetes APT repository
+  apt_repository:
+    repo: "{{ kubernetes_apt_repository }}"
+    state: present
+    update_cache: true
+
+- name: Pin Kubernetes version in APT preferences
+  template:
+    src: apt-preferences-kubernetes.j2
+    dest: /etc/apt/preferences.d/kubernetes
+    mode: 0644
+
+- name: Install Kubernetes packages
+  apt:
+    name:
+      - kubeadm
+      - kubectl
+      - kubelet
+    state: present

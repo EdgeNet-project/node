@@ -1,0 +1,33 @@
+---
+# Simplified version of
+# - https://github.com/geerlingguy/ansible-role-kubernetes (MIT)
+- name: Add Kubernetes YUM repository
+  yum_repository:
+    name: kubernetes
+    description: Kubernetes
+    enabled: true
+    gpgcheck: true
+    repo_gpgcheck: true
+    baseurl: "{{ kubernetes_yum_base_url }}"
+    gpgkey: "{{ kubernetes_yum_gpg_key }}"
+
+- name: Add Kubernetes YUM GPG keys
+  rpm_key:
+    key: "{{ item }}"
+    state: present
+  register: kubernetes_rpm_key
+  with_items: "{{ kubernetes_yum_gpg_key }}"
+
+- name: Make cache if Kubernetes GPG keys changed
+  command: "yum -q makecache -y --disablerepo='*' --enablerepo='kubernetes'"
+  when: kubernetes_rpm_key is changed
+  args:
+    warn: false
+
+- name: Install Kubernetes packages
+  yum:
+    name:
+      - "kubeadm-*{{ kubernetes_version }}*"
+      - "kubectl-*{{ kubernetes_version }}*"
+      - "kubelet-*{{ kubernetes_version }}*"
+    state: present
