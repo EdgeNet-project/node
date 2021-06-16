@@ -12,9 +12,6 @@ EDGENET_ASK_CONFIRMATION="${EDGENET_ASK_CONFIRMATION:-1}"
 # Which branch of the node repository to use.
 EDGENET_BRANCH="${EDGENET_BRANCH:-main}"
 
-# URL of the cluster public kubeconfig file.
-EDGENET_KUBECONFIG="${EDGENET_KUBECONFIG:-https://raw.githubusercontent.com/EdgeNet-project/edgenet/master/configs/public.cfg}"
-
 # Name of the playbook to run.
 EDGENET_PLAYBOOK="${EDGENET_PLAYBOOK:-edgenet-node.yml}"
 
@@ -111,6 +108,5 @@ fi
 # Run the node playbook.
 ansible-playbook --connection local \
   --extra-vars "ansible_python_interpreter=${PYTHON}" \
-  --extra-vars "edgenet_kubeconfig_url=${EDGENET_KUBECONFIG}" \
   --inventory "localhost," \
   "${LOCAL_REPOSITORY}/${EDGENET_PLAYBOOK}"
