@@ -109,7 +109,6 @@ else
 fi
 
 # Run the node playbook.
-export ANSIBLE_COLLECTIONS_PATHS="${LOCAL_REPOSITORY}"
 ansible-playbook --connection local \
   --extra-vars "ansible_python_interpreter=${PYTHON}" \
   --extra-vars "edgenet_kubeconfig_url=${EDGENET_KUBECONFIG}" \
