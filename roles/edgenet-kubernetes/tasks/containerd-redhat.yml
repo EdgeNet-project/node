@@ -1,0 +1,22 @@
+---
+# Simplified version of
+# - https://github.com/geerlingguy/ansible-role-containerd (MIT)
+- name: Add containerd YUM GPG keys
+  rpm_key:
+    key: "{{ containerd_yum_gpg_key }}"
+    state: present
+
+- name: Add containerd YUM repository
+  get_url:
+    url: "{{ containerd_yum_repo_url }}"
+    dest: '/etc/yum.repos.d/docker-ce.repo'
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install containerd
+  yum:
+    name:
+      - "containerd.io-*{{ containerd_version }}*"
+    state: present
+    update_cache: true

@@ -1,6 +1,12 @@
 ---
 # Simplified version of
 # - https://github.com/geerlingguy/ansible-role-kubernetes (MIT)
+- name: Add Kubernetes YUM GPG keys
+  rpm_key:
+    key: "{{ item }}"
+    state: present
+  loop: "{{ kubernetes_yum_gpg_key }}"
+
 - name: Add Kubernetes YUM repository
   yum_repository:
     name: kubernetes
@@ -8,13 +14,8 @@
     enabled: true
     gpgcheck: true
     repo_gpgcheck: true
-    baseurl: "{{ kubernetes_yum_base_url }}"
+    baseurl: "{{ kubernetes_yum_repo_url }}"
     gpgkey: "{{ kubernetes_yum_gpg_key }}"
-
-- name: Add Kubernetes YUM GPG keys
-  rpm_key:
-    key: "{{ item }}"
-    state: present
 
 - name: Install Kubernetes packages
   yum:

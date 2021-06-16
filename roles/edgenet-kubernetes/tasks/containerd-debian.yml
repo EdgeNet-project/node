@@ -8,6 +8,7 @@
       - ca-certificates
       - gnupg2
     state: present
+    update_cache: true
 
 - name: Add containerd APT GPG key
   apt_key:

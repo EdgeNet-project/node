@@ -1,3 +1,3 @@
-# edgenet.kubernetes
+# edgenet-kubernetes
 containerd_version: 1.4
 kubernetes_version: 1.19

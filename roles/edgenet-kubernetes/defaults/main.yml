@@ -18,7 +18,7 @@ containerd_yum_repo_url: "https://download.docker.com/linux/{{ (ansible_distribu
 containerd_yum_gpg_key: https://download.docker.com/linux/centos/gpg
 
 kubernetes_yum_arch: "{{ ansible_architecture }}"
-kubernetes_yum_base_url: "https://packages.cloud.google.com/yum/repos/kubernetes-el7-{{ kubernetes_yum_arch }}"
+kubernetes_yum_repo_url: "https://packages.cloud.google.com/yum/repos/kubernetes-el7-{{ kubernetes_yum_arch }}"
 kubernetes_yum_gpg_key:
   - https://packages.cloud.google.com/yum/doc/yum-key.gpg
   - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg

@@ -3,4 +3,3 @@ exclude_paths:
     - .pre-commit-config.yaml
 skip_list:
     - line-length
-    - role-name
