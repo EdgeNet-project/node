@@ -13,6 +13,7 @@ Name | Default | Description
 -----|---------|------------
 `EDGENET_ASK_CONFIRMATION` | 1 | Whether to ask to continue or not.
 `EDGENET_PLAYBOOK` | [edgenet-node.yml](edgenet-node.yml) | Name of the playbook to run.
+`EDGENET_REF` | main | Git reference to use.
 `EDGENET_REPOSITORY` |  https://github.com/EdgeNet-project/node.git | URL of the Git repository containing the playbook to run. Set to `.` to use the current directory (useful for local development).
 
 ## Ansible roles
@@ -27,8 +28,8 @@ Name | Description | Variables | Defaults
 ## Development
 
 ```bash
-git clone --recursive git@github.com:EdgeNet-project/node.git
-env EDGENET_REPOSITORY="file://$(pwd)" EDGENET_REF="$(git rev-parse HEAD)" ./bootstrap.sh
+git clone git@github.com:EdgeNet-project/node.git
+env EDGENET_REF="$(git rev-parse HEAD)" EDGENET_REPOSITORY="file://$(pwd)" ./bootstrap.sh
 ```
 
 ## Contributing
