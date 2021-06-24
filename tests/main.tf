@@ -14,16 +14,9 @@ provider "aws" {
   region  = "eu-west-1"
 }
 
-resource "aws_instance" "ubuntu-2004-x86" {
-  ami                    = "ami-0a8e758f5e873d1c1"
+resource "aws_instance" "centos-7-x86" {
+  ami                    = "ami-0b850cf02cc00fdc8"
   instance_type          = "t3.small"
-  key_name               = "maxime.mouchet@lip6.fr:edgenet"
-  vpc_security_group_ids = ["sg-0143626c6cdee2192"]
-}
-
-resource "aws_instance" "ubuntu-2004-arm64" {
-  ami                    = "ami-09e0d6fdf60750e33"
-  instance_type          = "t4g.small"
   key_name               = "maxime.mouchet@lip6.fr:edgenet"
   vpc_security_group_ids = ["sg-0143626c6cdee2192"]
 }
@@ -41,3 +34,18 @@ resource "aws_instance" "fedora-34-arm64" {
   key_name               = "maxime.mouchet@lip6.fr:edgenet"
   vpc_security_group_ids = ["sg-0143626c6cdee2192"]
 }
+
+resource "aws_instance" "ubuntu-1804-x86" {
+  ami                    = "ami-0c259a97cbf621daf"
+  instance_type          = "t3.small"
+  key_name               = "maxime.mouchet@lip6.fr:edgenet"
+  vpc_security_group_ids = ["sg-0143626c6cdee2192"]
+}
+
+resource "aws_instance" "ubuntu-2004-arm64" {
+  ami                    = "ami-09e0d6fdf60750e33"
+  instance_type          = "t4g.small"
+  key_name               = "maxime.mouchet@lip6.fr:edgenet"
+  vpc_security_group_ids = ["sg-0143626c6cdee2192"]
+}
+
