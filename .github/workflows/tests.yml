@@ -16,4 +16,4 @@ jobs:
           ./bootstrap.sh
         env:
           EDGENET_REPOSITORY: file:///home/runner/work/node/node
-          EDGENET_REF: ${{ env.GITHUB_SHA }}
+          EDGENET_REF: ${{ github.sha }}
