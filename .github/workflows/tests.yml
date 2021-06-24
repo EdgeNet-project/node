@@ -15,4 +15,4 @@ jobs:
         run: |
           ./bootstrap.sh
         env:
-          EDGENET_REPOSITORY: .
+          EDGENET_REPOSITORY: file:///home/runner/work/node/node
