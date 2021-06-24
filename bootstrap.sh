@@ -21,11 +21,11 @@ set -eu
 # Whether to ask to continue or not.
 EDGENET_ASK_CONFIRMATION="${EDGENET_ASK_CONFIRMATION:-1}"
 
-# Which branch of the node repository to use.
-EDGENET_BRANCH="${EDGENET_BRANCH:-main}"
-
 # Name of the playbook to run.
 EDGENET_PLAYBOOK="${EDGENET_PLAYBOOK:-edgenet-node.yml}"
+
+# Which branch of the node repository to use.
+EDGENET_REF="${EDGENET_REF:-main}"
 
 # URL of the Git repository containing the playbook to run.
 EDGENET_REPOSITORY="${EDGENET_REPOSITORY:-https://github.com/EdgeNet-project/node.git}"
@@ -97,28 +97,5 @@ if is_not_installed ansible || is_not_installed git; then
   esac
 fi
 
-# CentOS 7 has old versions of Ansible/Git/Python,
-# so we adjust the parameters in consequence.
-case "${ID}-${VERSION_ID}" in
-centos-7)
-  PYTHON="/usr/bin/python2" ;;
-
-*)
-  PYTHON="/usr/bin/python3" ;;
-esac
-
-# Fetch the repository.
-if [ "${EDGENET_REPOSITORY}" != "." ]; then
-  LOCAL_REPOSITORY=$(mktemp -d)
-  echo "Cloning ${EDGENET_REPOSITORY} to ${LOCAL_REPOSITORY}..."
-  git clone --depth 1 --quiet --single-branch --branch "${EDGENET_BRANCH}" \
-    "${EDGENET_REPOSITORY}" "${LOCAL_REPOSITORY}"
-else
-  LOCAL_REPOSITORY="${EDGENET_REPOSITORY}"
-fi
-
 # Run the node playbook.
-ansible-playbook --connection local \
-  --extra-vars "ansible_python_interpreter=${PYTHON}" \
-  --inventory "localhost," \
-  "${LOCAL_REPOSITORY}/${EDGENET_PLAYBOOK}"
+ansible-pull --accept-host-key --checkout "${EDGENET_REF}" --url "${EDGENET_REPOSITORY}" "${EDGENET_PLAYBOOK}"
