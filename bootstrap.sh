@@ -97,5 +97,15 @@ if is_not_installed ansible || is_not_installed git; then
   esac
 fi
 
+# CentOS 7 has old versions of Ansible/Git/Python,
+# so we adjust the parameters in consequence.
+case "${ID}-${VERSION_ID}" in
+centos-7)
+  PYTHON="/usr/bin/python2" ;;
+*)
+  PYTHON="/usr/bin/python3" ;;
+esac
+
 # Run the node playbook.
-ansible-pull --accept-host-key --checkout "${EDGENET_REF}" --url "${EDGENET_REPOSITORY}" "${EDGENET_PLAYBOOK}"
+ansible-pull --accept-host-key --extra-vars "ansible_python_interpreter=${PYTHON}" \
+  --checkout "${EDGENET_REF}" --url "${EDGENET_REPOSITORY}" "${EDGENET_PLAYBOOK}"
