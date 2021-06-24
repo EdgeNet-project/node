@@ -30,3 +30,8 @@ Name | Description | Variables | Defaults
 git clone --recursive git@github.com:EdgeNet-project/node.git
 env EDGENET_REPOSITORY=. ./bootstrap.sh
 ```
+
+## Contributing
+
+The EdgeNet software is free and open source, licensed under the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0); we invite you to contribute.  
+For more information, see [EdgeNet-project/edgenet](https://github.com/EdgeNet-project/edgenet#contributing).

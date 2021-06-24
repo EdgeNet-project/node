@@ -67,16 +67,16 @@ ${SUDO} true
 if is_not_installed ansible || is_not_installed git; then
   echo "Installing Ansible..."
   case "${ID}-${VERSION_ID}" in
-  centos-7 | centos-8)
+  centos-*)
     ${SUDO} yum install --assumeyes --quiet epel-release
     ${SUDO} yum install --assumeyes --quiet ansible git
     ;;
 
-  fedora-32 | fedora-33)
+  fedora-*)
     ${SUDO} dnf install --assumeyes --quiet ansible git
     ;;
 
-  ubuntu-18* | ubuntu-19*)
+  ubuntu-1*)
     export DEBIAN_FRONTEND=noninteractive
     ${SUDO} apt update --quiet
     ${SUDO} apt install --quiet --yes dirmngr software-properties-common
@@ -84,7 +84,7 @@ if is_not_installed ansible || is_not_installed git; then
     ${SUDO} apt install --quiet --yes ansible git
     ;;
 
-  ubuntu-20* | ubuntu-21*)
+  ubuntu-2*)
     export DEBIAN_FRONTEND=noninteractive
     ${SUDO} apt update --quiet
     ${SUDO} apt install --quiet --yes ansible git
