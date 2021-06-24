@@ -1,0 +1,64 @@
+---
+- name: Install 'bash', 'sudo' and 'openssh-server'
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - bash
+    - sudo
+    - openssh-server
+
+- name: Make sure we have a 'wheel' group
+  group:
+    name: wheel
+    state: present
+
+- name: Allow 'wheel' group to have passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+    regexp: '^%wheel'
+    validate: 'visudo -cf %s'
+    state: present
+
+- name: "Create the EdgeNet user ({{ edgenet_ssh_user }})"
+  user:
+    name: "{{ edgenet_ssh_user }}"
+    shell: /bin/bash
+    groups: wheel
+    append: true
+    createhome: true
+    comment: EdgeNet (edge-net.org)
+
+- name: Ensures that .ssh exists
+  file:
+    path: "/home/{{ edgenet_ssh_user }}/.ssh"
+    owner: "{{ edgenet_ssh_user }}"
+    group: "{{ edgenet_ssh_user }}"
+    mode: "0700"
+    state: directory
+
+- name: Install the EdgeNet public SSH key
+  lineinfile:
+    dest: "/home/{{ edgenet_ssh_user }}/.ssh/authorized_keys"
+    line: "{{ edgenet_ssh_public_key }}"
+    owner: "{{ edgenet_ssh_user }}"
+    group: "{{ edgenet_ssh_user }}"
+    mode: "0600"
+    create: true
+    state: present
+
+- name: "Set SSH ports (22 and {{ edgenet_ssh_port_alt }})"
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    line: "{{ item }}"
+    state: present
+  with_items:
+    - "Port 22"
+    - "Port {{ edgenet_ssh_port_alt }}"
+
+- name: Enable the SSH server (state=reloaded)
+  systemd:
+    name: sshd
+    enabled: true
+    state: reloaded

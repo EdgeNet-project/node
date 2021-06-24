@@ -1,0 +1,24 @@
+---
+containerd_service_state: restarted
+edgenet_service_state: restarted
+kubelet_service_state: restarted
+
+# Debian
+containerd_apt_release_channel: stable
+containerd_apt_arch: "{{ (ansible_architecture == 'aarch64') | ternary('arm64', 'amd64') }}"
+containerd_apt_repository: "deb [arch={{ containerd_apt_arch }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} {{ containerd_apt_release_channel }}"
+containerd_apt_gpg_key: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+
+kubernetes_apt_release_channel: main
+kubernetes_apt_repository: "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] http://apt.kubernetes.io/ kubernetes-xenial {{ kubernetes_apt_release_channel }}"
+kubernetes_apt_gpg_key: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+# RedHat
+containerd_yum_repo_url: "https://download.docker.com/linux/{{ (ansible_distribution == 'Fedora') | ternary('fedora', 'centos') }}/docker-ce.repo"
+containerd_yum_gpg_key: https://download.docker.com/linux/centos/gpg
+
+kubernetes_yum_arch: "{{ ansible_architecture }}"
+kubernetes_yum_repo_url: "https://packages.cloud.google.com/yum/repos/kubernetes-el7-{{ kubernetes_yum_arch }}"
+kubernetes_yum_gpg_key:
+  - https://packages.cloud.google.com/yum/doc/yum-key.gpg
+  - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg

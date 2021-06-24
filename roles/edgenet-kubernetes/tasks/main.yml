@@ -1,0 +1,81 @@
+---
+- name: Disable swap (boot)
+  replace:
+    path: /etc/fstab
+    regexp: '^\s*[^#](.+swap\s+swap.+)$'
+    replace: '# \1'
+    backup: true
+
+- name: Disable swap (session)
+  command: swapoff -a
+  tags: ['skip_ansible_lint']
+
+- name: Install EdgeNet files
+  copy:
+    src: edgenet/
+    dest: /opt/edgenet
+    mode: "0755"
+
+- name: Install EdgeNet service
+  copy:
+    src: edgenet.service
+    dest: /etc/systemd/system/edgenet.service
+    mode: "0644"
+
+- name: Install containerd
+  include_tasks: containerd.yml
+
+- name: Install Kubernetes
+  include_tasks: kube.yml
+
+- name: Ensures NetworkManager conf.d exists
+  file:
+    path: /etc/NetworkManager/conf.d
+    state: directory
+    mode: "0755"
+
+- name: Configure NetworkManager
+  copy:
+    src: NetworkManager-calico.conf
+    dest: /etc/NetworkManager/conf.d/calico.conf
+    mode: "0644"
+
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#letting-iptables-see-bridged-traffic
+# https://kubernetes.io/docs/setup/production-environment/container-runtimes/
+- name: Load kernel modules (boot)
+  copy:
+    src: modules-k8s.conf
+    dest: /etc/modules-load.d/k8s.conf
+    mode: "0644"
+
+- name: Load kernel modules (session)
+  command:
+    cmd: "modprobe {{ item }}"
+  tags: ['skip_ansible_lint']
+  loop:
+    - br_netfilter
+    - ip_conntrack
+    - overlay
+
+- name: Let iptables see bridged traffic
+  sysctl:
+    name: "{{ item }}"
+    value: "1"
+    state: present
+  loop:
+    - net.bridge.bridge-nf-call-iptables
+    - net.bridge.bridge-nf-call-ip6tables
+    - net.ipv4.ip_forward
+
+# https://docs.projectcalico.org/maintenance/troubleshoot/troubleshooting#configure-networkmanager
+- name: Increase conntrack table size
+  sysctl:
+    name: net.netfilter.nf_conntrack_max
+    value: "1000000"
+    state: present
+
+- name: "Enable EdgeNet service (state={{ edgenet_service_state }})"
+  systemd:
+    name: edgenet
+    state: "{{ edgenet_service_state }}"
+    enabled: true

@@ -1,0 +1,20 @@
+[Unit]
+Description=EdgeNet
+Documentation=https://edge-net.org/
+After=ssh.service
+Before=kubelet.service
+StartLimitBurst=2
+StartLimitIntervalSec=600
+
+[Service]
+ExecStart=/opt/edgenet/update-hostname.sh
+ExecStart=/opt/edgenet/update-public-ip.sh
+ExecStart=/opt/edgenet/join-cluster.sh
+RemainAfterExit=yes
+# NOTE: CentOS has an old systemd version which doesn't allow restarting oneshot services...
+# Restart=on-failure
+# RestartSec=10s
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target

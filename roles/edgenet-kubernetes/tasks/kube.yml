@@ -1,0 +1,12 @@
+---
+- include_tasks: kube-debian.yml
+  when: ansible_os_family == 'Debian'
+
+- include_tasks: kube-redhat.yml
+  when: ansible_os_family == 'RedHat'
+
+- name: "Enable kubelet (state={{ kubelet_service_state }})"
+  service:
+    name: kubelet
+    state: "{{ kubelet_service_state }}"
+    enabled: true

@@ -1,0 +1,24 @@
+---
+- include_tasks: containerd-debian.yml
+  when: ansible_os_family == 'Debian'
+
+- include_tasks: containerd-redhat.yml
+  when: ansible_os_family == 'RedHat'
+
+- name: Ensure containerd config directory exists
+  file:
+    path: /etc/containerd
+    state: directory
+    mode: "0755"
+
+- name: Configure containerd
+  copy:
+    src: containerd.toml
+    dest: /etc/containerd/config.toml
+    mode: "0644"
+
+- name: "Enable containerd (state={{ containerd_service_state }})"
+  service:
+    name: containerd
+    state: "{{ containerd_service_state }}"
+    enabled: true

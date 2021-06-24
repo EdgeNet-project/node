@@ -1,0 +1,39 @@
+---
+# Simplified version of
+# - https://github.com/geerlingguy/ansible-role-kubernetes (MIT)
+# - https://github.com/geerlingguy/ansible-role-kubernetes/issues/105
+- name: Ensure APT dependencies are installed
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - gnupg2
+    state: present
+
+- name: Add Kubernetes APT GPG key
+  get_url:
+    url: "{{ kubernetes_apt_gpg_key }}"
+    dest: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+
+- name: Add Kubernetes APT repository
+  apt_repository:
+    repo: "{{ kubernetes_apt_repository }}"
+    state: present
+
+- name: Pin Kubernetes version in APT preferences
+  template:
+    src: apt-preferences-kubernetes.j2
+    dest: /etc/apt/preferences.d/kubernetes
+    mode: 0644
+
+- name: Install Kubernetes packages
+  apt:
+    name:
+      - "kubeadm={{ kubernetes_version }}*"
+      - "kubectl={{ kubernetes_version }}*"
+      - "kubelet={{ kubernetes_version }}*"
+    state: present
+    update_cache: true
+    # TODO: Remove `force: true` when the following PR will be merged:
+    # https://github.com/ansible/ansible/pull/74852
+    force: true
