@@ -11,9 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Bootstrap
-        run: |
-          ./bootstrap.sh
+      - run: ./bootstrap.sh
         env:
-          EDGENET_REPOSITORY: file:///home/runner/work/node/node
+          EDGENET_REPOSITORY: file://${{ github.workspace }}
           EDGENET_REF: ${{ github.sha }}
