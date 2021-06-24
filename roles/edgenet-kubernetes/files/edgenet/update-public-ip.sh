@@ -42,7 +42,6 @@ elif scw >/dev/null; then
   intip=$(scw PRIVATE_IP)
   pubip=$(scw PUBLIC_IP_ADDRESS)
 else
-  echo "KUBELET_EXTRA_ARGS=--cgroup-driver=systemd" | tee >/etc/default/kubelet
   exit
 fi
 
