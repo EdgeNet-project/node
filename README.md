@@ -14,7 +14,7 @@ Name | Default | Description
 `EDGENET_ASK_CONFIRMATION` | 1 | Whether to ask to continue or not.
 `EDGENET_PLAYBOOK` | [edgenet-node.yml](edgenet-node.yml) | Name of the playbook to run.
 `EDGENET_REF` | main | Git reference to use.
-`EDGENET_REPOSITORY` |  https://github.com/EdgeNet-project/node.git | URL of the Git repository containing the playbook to run. Set to `.` to use the current directory (useful for local development).
+`EDGENET_REPOSITORY` |  https://github.com/EdgeNet-project/node.git | URL of the Git repository containing the playbook to run.
 
 ## Ansible roles
 
