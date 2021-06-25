@@ -42,7 +42,7 @@ elif scw >/dev/null; then
   intip=$(scw PRIVATE_IP)
   pubip=$(scw PUBLIC_IP_ADDRESS)
 else
-  exit
+  exit 0
 fi
 
 # Find the interface which has the internal IP.
