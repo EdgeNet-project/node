@@ -30,11 +30,10 @@ done
 if [ ! -f /var/lib/kubelet/config.yaml ]; then
   nodecontribution=$(mktemp)
   cat << EOF > "${nodecontribution}"
-apiVersion: apps.edgenet.io/v1alpha
+apiVersion: core.edgenet.io/v1alpha
 kind: NodeContribution
 metadata:
   name: ${hostname%.edge-net.io}
-  namespace: authority-edgenet
 spec:
   host: ${pubip}
   port: 22
