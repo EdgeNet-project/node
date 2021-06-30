@@ -4,3 +4,4 @@ playbook.retry
 *.log
 *.tfstate*
 .terraform*
+node

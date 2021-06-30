@@ -2,7 +2,7 @@ exclude: ^(ansible_collections).*$
 
 repos:
 - repo: https://github.com/ansible-community/ansible-lint.git
-  rev: v5.0.12
+  rev: v5.1.0a1
   hooks:
     - id: ansible-lint
 
@@ -10,6 +10,11 @@ repos:
   rev: 2.1.5
   hooks:
     - id: shellcheck
+
+- repo: git://github.com/dnephin/pre-commit-golang
+  rev: v0.4.0
+  hooks:
+    - id: go-fmt
 
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v4.0.1

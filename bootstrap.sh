@@ -107,5 +107,5 @@ centos-7)
 esac
 
 # Run the node playbook.
-ansible-pull --accept-host-key --extra-vars "ansible_python_interpreter=${PYTHON}" \
+ansible-pull --accept-host-key --extra-vars "ansible_python_interpreter=${PYTHON}" --inventory localhost, \
   --checkout "${EDGENET_REF}" --url "${EDGENET_REPOSITORY}" "${EDGENET_PLAYBOOK}"

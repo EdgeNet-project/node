@@ -10,10 +10,16 @@
   command: swapoff -a
   tags: ['skip_ansible_lint']
 
-- name: Install EdgeNet files
-  copy:
-    src: edgenet/
-    dest: /opt/edgenet
+- name: Ensures EdgeNet directory exists
+  file:
+    path: /opt/edgenet
+    state: directory
+    mode: "0755"
+
+- name: Download EdgeNet service
+  get_url:
+    url: "{{ edgenet_node_url }}"
+    dest: /opt/edgenet/node
     mode: "0755"
 
 - name: Install EdgeNet service
