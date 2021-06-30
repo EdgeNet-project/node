@@ -1,0 +1,44 @@
+name: Build
+
+on:
+  push:
+    paths-ignore: [ '**.md' ]
+  pull_request:
+    paths-ignore: [ '**.md' ]
+  release:
+    types: [published]
+
+jobs:
+  build-amd64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.16'
+      - run: GOARCH=amd64 go build -o node-linux-amd64
+      - uses: actions/upload-artifact@v2
+        with:
+          name: node-linux-amd64
+          path: node-linux-amd64
+      - if: github.event_name == 'release'
+        run: gh release upload --clobber ${{ github.event.release.tag_name }} node-linux-amd64
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-arm64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.16'
+      - run: GOARCH=arm64 go build -o node-linux-arm64
+      - uses: actions/upload-artifact@v2
+        with:
+          name: node-linux-arm64
+          path: node-linux-arm64
+      - if: github.event_name == 'release'
+        run: gh release upload --clobber ${{ github.event.release.tag_name }} node-linux-arm64
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

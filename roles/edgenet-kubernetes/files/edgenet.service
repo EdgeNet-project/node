@@ -8,9 +8,7 @@ StartLimitBurst=2
 StartLimitIntervalSec=600
 
 [Service]
-ExecStart=/opt/edgenet/update-hostname.sh
-ExecStart=/opt/edgenet/update-public-ip.sh
-ExecStart=/opt/edgenet/join-cluster.sh
+ExecStart=/opt/edgenet/node
 RemainAfterExit=yes
 # NOTE: CentOS has an old systemd version which doesn't allow restarting oneshot services...
 # Restart=on-failure

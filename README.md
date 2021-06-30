@@ -1,6 +1,6 @@
 # EdgeNet Node Setup
 
-[![Tests](https://github.com/EdgeNet-project/node/actions/workflows/tests.yml/badge.svg)](https://github.com/EdgeNet-project/node/actions/workflows/tests.yml)
+[![Build](https://github.com/EdgeNet-project/node/actions/workflows/build.yml/badge.svg)](https://github.com/EdgeNet-project/node/actions/workflows/build.yml)
 
 **For instructions on how to use and how to contribute a node to EdgeNet, please see the [EdgeNet website](https://edgenet-project.github.io/).**
 
