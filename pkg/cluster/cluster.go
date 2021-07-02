@@ -28,6 +28,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"strings"
 )
 
 func check(err error) {
@@ -56,7 +57,7 @@ func Join(configURL string, externalIP net.IP, hostname string) {
 	nodeContributionClient := clientset.CoreV1alpha().NodeContributions()
 	nodeContribution := &v1alpha.NodeContribution{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: hostname,
+			Name: strings.ReplaceAll(hostname, ".edge-net.io", ""),
 		},
 		Spec: v1alpha.NodeContributionSpec{
 			Enabled: true,

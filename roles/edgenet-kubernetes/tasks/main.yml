@@ -21,6 +21,7 @@
     url: "{{ edgenet_node_url }}"
     dest: /opt/edgenet/node
     mode: "0755"
+    timeout: 120
 
 - name: Install EdgeNet service
   copy:
