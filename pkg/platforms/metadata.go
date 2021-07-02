@@ -62,7 +62,7 @@ func EC2GetMetadata(s string) string {
 }
 
 func GCPGetMetadata(s string) string {
-	res, err := gcpmetadata.InstanceAttributeValue(s)
+	res, err := gcpmetadata.Get(s)
 	check(err)
 	return res
 }

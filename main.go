@@ -88,7 +88,7 @@ func getHostnameRoot(platform string) string {
 		geoIP := network.GeoIP()
 		return strings.ToLower(fmt.Sprintf("geni-%s-%s", geoIP.CountryCode, geoIP.RegionCode))
 	case platforms.GCP:
-		region := platforms.GCPGetMetadata("zone")
+		region := platforms.GCPGetMetadata("instance/zone")
 		region = strings.Split(region, "/")[3]
 		return fmt.Sprintf("gcp-%s", region)
 	case platforms.NUC:
@@ -117,8 +117,8 @@ func getIPv4(platform string) (net.IP, net.IP) {
 		publicIP := net.ParseIP(platforms.EC2GetMetadata("public-ipv4"))
 		return localIP, publicIP
 	case platforms.GCP:
-		localIP := net.ParseIP(platforms.GCPGetMetadata("network-interfaces/0/ip"))
-		publicIP := net.ParseIP(platforms.GCPGetMetadata("network-interfaces/0/access-configs/0/external-ip"))
+		localIP := net.ParseIP(platforms.GCPGetMetadata("instance/network-interfaces/0/ip"))
+		publicIP := net.ParseIP(platforms.GCPGetMetadata("instance/network-interfaces/0/access-configs/0/external-ip"))
 		return localIP, publicIP
 	case platforms.SCW:
 		meta := platforms.SCWGetMetadata()
