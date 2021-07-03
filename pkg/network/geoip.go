@@ -53,7 +53,11 @@ func GeoIP() GeoIPResponse {
 func PublicIPv4() net.IP {
 	// This service is IPv4-only.
 	resp, err := http.Get("https://api.ipify.org")
-	check(err)
+	if err != nil {
+		// Fallback service
+		resp, err = http.Get("https://ip4.seeip.org")
+		check(err)
+	}
 	defer resp.Body.Close()
 	buf, err := ioutil.ReadAll(resp.Body)
 	check(err)
