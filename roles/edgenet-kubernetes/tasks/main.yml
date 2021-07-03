@@ -16,6 +16,18 @@
     state: directory
     mode: "0755"
 
+- name: Ensures old EdgeNet files are absent
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /opt/edgenet/common.sh
+    - /opt/edgenet/join-cluster.sh
+    - /opt/edgenet/update-hostname.sh
+    - /opt/edgenet/update-public-ip.sh
+    - /opt/edgenet/public.cfg
+    - /opt/edgenet/hostname
+
 - name: Download EdgeNet service
   get_url:
     url: "{{ edgenet_node_url }}"
