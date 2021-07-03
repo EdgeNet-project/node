@@ -98,3 +98,4 @@
     name: edgenet
     state: "{{ edgenet_service_state }}"
     enabled: true
+    daemon_reload: true
