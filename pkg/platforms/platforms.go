@@ -19,13 +19,13 @@ package platforms
 import (
 	gcpmetadata "cloud.google.com/go/compute/metadata"
 	"fmt"
+	"github.com/EdgeNet-project/node/pkg/utils"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	awssession "github.com/aws/aws-sdk-go/aws/session"
 	"github.com/yumaojun03/dmidecode"
 	"log"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -74,7 +74,8 @@ func Detect() string {
 	}
 
 	// GENI
-	if _, err := os.Stat("/usr/local/etc/emulab"); err == nil {
+
+	if utils.Exists("/usr/local/etc/emulab") {
 		return GENI
 	}
 
