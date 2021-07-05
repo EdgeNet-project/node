@@ -45,6 +45,14 @@ git clone git@github.com:EdgeNet-project/node.git
 env EDGENET_REF="$(git rev-parse HEAD)" EDGENET_REPOSITORY="file://$(pwd)" ./bootstrap.sh
 ```
 
+## Cluster-wide play
+
+To run a playbook across all the nodes of the cluster:
+```bash
+kubectl get nodes -l node-role.kubernetes.io/control-plane!= -o json | jq -r '.items[].status.addresses[0].address' > nodes.ini
+ansible-playbook -i nodes.ini ...
+```
+
 ## Contributing
 
 The EdgeNet software is free and open source, licensed under the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0); we invite you to contribute.
