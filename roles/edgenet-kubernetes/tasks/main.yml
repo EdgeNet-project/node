@@ -19,6 +19,15 @@
     state: present
   when: ansible_distribution == 'Ubuntu'
 
+# This is a (temporary?) hack to fix an issue with Google's Kubernetes repository.
+# E: Failed to fetch https://packages.cloud.google.com/apt/dists/kubernetes-xenial/main/binary-arm64/by-hash/SHA256/536531faf6df19cafb3ee304de5ed6787c3b5a1c20f1223dcbe6fd70ff9f93bb  404  Not Found [IP: 2404:6800:4004:81f::200e 443]
+- name: Ensure APT uses IPv4
+  copy:
+    dest: /etc/apt/apt.conf.d/99force-ipv4
+    mode: "0644"
+    content: 'Acquire::ForceIPv4 "true";'
+  when: ansible_os_family == 'Debian'
+
 - name: Install containerd
   include_tasks: containerd.yml
 
