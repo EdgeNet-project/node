@@ -11,14 +11,15 @@
     state: directory
     mode: "0755"
 
-- name: Configure containerd
+- name: Ensure containerd configuration is up-to-date
   copy:
     src: containerd.toml
     dest: /etc/containerd/config.toml
     mode: "0644"
+  notify: restart containerd
 
-- name: "Enable containerd (state={{ containerd_service_state }})"
-  service:
+- name: Ensure containerd is started and enabled at boot
+  systemd:
     name: containerd
-    state: "{{ containerd_service_state }}"
+    state: started
     enabled: true

@@ -10,23 +10,23 @@
     state: present
     update_cache: true
 
-- name: Add containerd APT GPG key
+- name: Ensure containerd APT GPG key is present
   apt_key:
     url: "{{ containerd_apt_gpg_key }}"
     state: present
 
-- name: Add containerd APT repository
+- name: Ensure containerd APT repository is present
   apt_repository:
     repo: "{{ containerd_apt_repository }}"
     state: present
 
-- name: Pin containerd version in APT preferences
+- name: Ensure containerd version is pinned in APT preferences
   template:
     src: apt-preferences-containerd.j2
     dest: /etc/apt/preferences.d/containerd
     mode: 0644
 
-- name: Install containerd
+- name: Ensure containerd is installed
   apt:
     name: "containerd.io={{ containerd_version }}*"
     state: present
@@ -34,3 +34,4 @@
     # TODO: Remove `force: true` when the following PR will be merged:
     # https://github.com/ansible/ansible/pull/74852
     force: true
+  notify: restart containerd

@@ -10,23 +10,23 @@
       - gnupg2
     state: present
 
-- name: Add Kubernetes APT GPG key
+- name: Ensure Kubernetes APT GPG key is present
   get_url:
     url: "{{ kubernetes_apt_gpg_key }}"
     dest: /usr/share/keyrings/kubernetes-archive-keyring.gpg
 
-- name: Add Kubernetes APT repository
+- name: Ensure Kubernetes APT repository is present
   apt_repository:
     repo: "{{ kubernetes_apt_repository }}"
     state: present
 
-- name: Pin Kubernetes version in APT preferences
+- name: Ensure Kubernetes version is pinned in APT preferences
   template:
     src: apt-preferences-kubernetes.j2
     dest: /etc/apt/preferences.d/kubernetes
     mode: 0644
 
-- name: Install Kubernetes packages
+- name: Ensure Kubernetes packages are installed
   apt:
     name:
       - "kubeadm={{ kubernetes_version }}*"
@@ -37,3 +37,4 @@
     # TODO: Remove `force: true` when the following PR will be merged:
     # https://github.com/ansible/ansible/pull/74852
     force: true
+  notify: restart kubelet

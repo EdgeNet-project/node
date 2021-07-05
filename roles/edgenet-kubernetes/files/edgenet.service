@@ -4,8 +4,8 @@ Documentation=https://edge-net.org/
 # testbed.service is the GENI EmuLab service that changes the hostname.
 After=ssh.service testbed.service
 Before=kubelet.service
-StartLimitBurst=2
-StartLimitIntervalSec=600
+#StartLimitBurst=2
+#StartLimitIntervalSec=600
 
 [Service]
 ExecStart=/opt/edgenet/node

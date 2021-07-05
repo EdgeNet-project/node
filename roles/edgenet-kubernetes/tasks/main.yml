@@ -1,22 +1,78 @@
 ---
-- name: Disable swap (boot)
+# Kubernetes requires swap to be disabled.
+- name: Ensure swap is disabled on boot
   replace:
     path: /etc/fstab
     regexp: '^\s*[^#](.+swap\s+swap.+)$'
     replace: '# \1'
     backup: true
 
-- name: Disable swap (session)
-  command: swapoff -a
+- name: Ensure swap is disabled for the session
   tags: ['skip_ansible_lint']
+  command: swapoff -a
 
-- name: Ensures EdgeNet directory exists
+- name: Install containerd
+  include_tasks: containerd.yml
+
+- name: Install Kubernetes
+  include_tasks: kube.yml
+
+# Calico-specific NetworkManager configuration
+# https://docs.projectcalico.org/maintenance/troubleshoot/troubleshooting#configure-networkmanager
+- name: Ensure NetworkManager conf.d exists
+  file:
+    path: /etc/NetworkManager/conf.d
+    state: directory
+    mode: "0755"
+
+- name: Ensure Calico NetworkManager configuration is present
+  copy:
+    src: NetworkManager-calico.conf
+    dest: /etc/NetworkManager/conf.d/calico.conf
+    mode: "0644"
+
+# Kubernetes required modules and network configuration
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#letting-iptables-see-bridged-traffic
+# https://kubernetes.io/docs/setup/production-environment/container-runtimes/
+- name: Ensure Kubernetes kernel modules are loaded on boot
+  copy:
+    src: modules-k8s.conf
+    dest: /etc/modules-load.d/k8s.conf
+    mode: "0644"
+
+- name: Ensure Kubernetes kernel modules are loaded for the session
+  tags: ['skip_ansible_lint']
+  command:
+    cmd: "modprobe {{ item }}"
+  loop:
+    - br_netfilter
+    - ip_conntrack
+    - overlay
+
+- name: Ensure iptables can see bridged traffic
+  sysctl:
+    name: "{{ item }}"
+    value: "1"
+    state: present
+  loop:
+    - net.bridge.bridge-nf-call-iptables
+    - net.bridge.bridge-nf-call-ip6tables
+    - net.ipv4.ip_forward
+
+- name: Ensure conntrack table size is large enough
+  sysctl:
+    name: net.netfilter.nf_conntrack_max
+    value: "1000000"
+    state: present
+
+- name: Ensure EdgeNet directory exists
   file:
     path: /opt/edgenet
     state: directory
     mode: "0755"
 
-- name: Ensures old EdgeNet files are absent
+# TODO: Delete this once it has been applied cluster-wide.
+- name: Ensure old EdgeNet files are absent
   file:
     path: "{{ item }}"
     state: absent
@@ -28,70 +84,23 @@
     - /opt/edgenet/public.cfg
     - /opt/edgenet/hostname
 
-- name: Download EdgeNet service
+- name: Ensure EdgeNet binary is present
   get_url:
     url: "{{ edgenet_node_url }}"
+    # The checksum is necessary for Ansible to re-download the binary if it has changed.
+    checksum: "{{ edgenet_node_checksum }}"
     dest: /opt/edgenet/node
     mode: "0755"
     timeout: 120
 
-- name: Install EdgeNet service
+- name: Ensure EdgeNet service is present
   copy:
     src: edgenet.service
     dest: /etc/systemd/system/edgenet.service
     mode: "0644"
 
-- name: Install containerd
-  include_tasks: containerd.yml
-
-- name: Install Kubernetes
-  include_tasks: kube.yml
-
-- name: Ensures NetworkManager conf.d exists
-  file:
-    path: /etc/NetworkManager/conf.d
-    state: directory
-    mode: "0755"
-
-- name: Configure NetworkManager
-  copy:
-    src: NetworkManager-calico.conf
-    dest: /etc/NetworkManager/conf.d/calico.conf
-    mode: "0644"
-
-# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#letting-iptables-see-bridged-traffic
-# https://kubernetes.io/docs/setup/production-environment/container-runtimes/
-- name: Load kernel modules (boot)
-  copy:
-    src: modules-k8s.conf
-    dest: /etc/modules-load.d/k8s.conf
-    mode: "0644"
-
-- name: Load kernel modules (session)
-  command:
-    cmd: "modprobe {{ item }}"
-  tags: ['skip_ansible_lint']
-  loop:
-    - br_netfilter
-    - ip_conntrack
-    - overlay
-
-- name: Let iptables see bridged traffic
-  sysctl:
-    name: "{{ item }}"
-    value: "1"
-    state: present
-  loop:
-    - net.bridge.bridge-nf-call-iptables
-    - net.bridge.bridge-nf-call-ip6tables
-    - net.ipv4.ip_forward
-
-# https://docs.projectcalico.org/maintenance/troubleshoot/troubleshooting#configure-networkmanager
-- name: Increase conntrack table size
-  sysctl:
-    name: net.netfilter.nf_conntrack_max
-    value: "1000000"
-    state: present
+- name: Flush handlers
+  meta: flush_handlers
 
 - name: "Enable EdgeNet service (state={{ edgenet_service_state }})"
   systemd:
