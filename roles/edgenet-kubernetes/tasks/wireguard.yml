@@ -5,12 +5,11 @@
     state: present
   when: ansible_os_family == 'Debian'
 
-- name: Enssure the WireGuard kernel module repository is present (CentOS, RHEL)
+- name: Ensure the WireGuard kernel module repository is present (CentOS, RHEL)
   yum:
     name:
       - epel-release
       - elrepo-release
-      - yum-plugin-repo
     state: present
   when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
