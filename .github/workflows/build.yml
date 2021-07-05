@@ -19,12 +19,16 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: '^1.16'
-      - run: |
-          go build -o node-linux-$GOARCH
+      # https://stackoverflow.com/questions/3861634/how-to-reduce-compiled-file-size
+      - name: Build
+        run: |
+          go build -ldflags="-s -w" -o node-linux-$GOARCH
+          upx node-linux-$GOARCH
           sha256sum node-linux-$GOARCH > node-linux-$GOARCH.sha256
         env:
           GOARCH: ${{ matrix.arch }}
-      - if: github.event_name == 'release'
+      - name: Upload
+        if: github.event_name == 'release'
         run: gh release upload --clobber $TAG_NAME node-linux-$GOARCH node-linux-$GOARCH.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
