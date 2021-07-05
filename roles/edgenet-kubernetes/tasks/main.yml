@@ -17,6 +17,9 @@
 - name: Install Kubernetes
   include_tasks: kube.yml
 
+- name: Install Wireguard
+  include_tasks: wireguard.yml
+
 # Calico-specific NetworkManager configuration
 # https://docs.projectcalico.org/maintenance/troubleshoot/troubleshooting#configure-networkmanager
 - name: Ensure NetworkManager conf.d exists

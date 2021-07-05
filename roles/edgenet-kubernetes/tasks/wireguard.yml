@@ -1,0 +1,27 @@
+---
+- name: Ensure WireGuard is installed (Debian)
+  apt:
+    name: wireguard
+    state: present
+  when: ansible_os_family == 'Debian'
+
+- name: Enssure the WireGuard kernel module repository is present (CentOS, RHEL)
+  yum:
+    name:
+      - epel-release
+      - elrepo-release
+      - yum-plugin-repo
+    state: present
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: Ensure the WireGuard kernel module is installed (CentOS, RHEL)
+  yum:
+    name: kmod-wireguard
+    state: present
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: Ensure WireGuard is installed (RedHat)
+  yum:
+    name: wireguard-tools
+    state: present
+  when: ansible_os_family == 'RedHat'
