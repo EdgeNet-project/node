@@ -2,7 +2,7 @@
 
 [![Build](https://github.com/EdgeNet-project/node/actions/workflows/build.yml/badge.svg)](https://github.com/EdgeNet-project/node/actions/workflows/build.yml)
 
-**For instructions on how to use and how to contribute a node to EdgeNet, please see the [EdgeNet website](https://edgenet-project.github.io/).**
+**For instructions on how to use and how to contribute a node to EdgeNet, please see the [EdgeNet website](https://www.edge-net.org/pages/node-contribution.html).**
 
 ## Architecture
 
