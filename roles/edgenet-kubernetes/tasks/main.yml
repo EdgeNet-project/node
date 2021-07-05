@@ -11,6 +11,14 @@
   tags: ['skip_ansible_lint']
   command: swapoff -a
 
+# This is to simplify future Ansible calls, since by default
+# it uses /usr/bin/python which does not exists on Ubuntu.
+- name: Ensure python is python3 on Ubuntu
+  apt:
+    name: python-is-python3
+    state: present
+  when: ansible_distribution == 'Ubuntu'
+
 - name: Install containerd
   include_tasks: containerd.yml
 
