@@ -1,0 +1,27 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Clean packages
+      apt:
+        autoclean: true
+        autoremove: true
+      when: ansible_os_family == 'Debian'
+
+    - name: Ensure packages are up-to-date
+      apt:
+        update_cache: true
+        upgrade: true
+      when: ansible_os_family == 'Debian'
+
+    - name: Clean packages
+      yum:
+        autoremove: true
+      when: ansible_os_family == 'RedHat'
+
+    - name: Ensure packages are up-to-date
+      yum:
+        name: '*'
+        state: latest
+        exclude: kernel*,kube*,containerd*
+      when: ansible_os_family == 'RedHat'
