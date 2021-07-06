@@ -1,8 +1,9 @@
 # EdgeNet Node Setup
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/EdgeNet-project/node)](https://goreportcard.com/report/github.com/EdgeNet-project/node)
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/EdgeNet-project/node/Build?logo=github&logoColor=white)](https://github.com/EdgeNet-project/node/actions/workflows/build.yml)
-[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/EdgeNet-project/node?logo=github&logoColor=white)](https://github.com/EdgeNet-project/node/releases)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/EdgeNet-project/node/Build?label=build)](https://github.com/EdgeNet-project/node/actions/workflows/build.yml)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/EdgeNet-project/node/CodeQL?label=codeql)](https://github.com/EdgeNet-project/node/actions/workflows/codeql-analysis.yml)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/EdgeNet-project/node)](https://github.com/EdgeNet-project/node/releases)
 
 📌 **For instructions on how to use and how to contribute a node to EdgeNet, please see the [EdgeNet website](https://www.edge-net.org/pages/node-contribution.html).**
 
