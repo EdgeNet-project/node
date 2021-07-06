@@ -1,8 +1,10 @@
 # EdgeNet Node Setup
 
-[![Build](https://github.com/EdgeNet-project/node/actions/workflows/build.yml/badge.svg)](https://github.com/EdgeNet-project/node/actions/workflows/build.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/EdgeNet-project/node)](https://goreportcard.com/report/github.com/EdgeNet-project/node)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/EdgeNet-project/node/Build?logo=github&logoColor=white)](https://github.com/EdgeNet-project/node/actions/workflows/build.yml)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/EdgeNet-project/node?logo=github&logoColor=white)](https://github.com/EdgeNet-project/node/releases)
 
-**For instructions on how to use and how to contribute a node to EdgeNet, please see the [EdgeNet website](https://www.edge-net.org/pages/node-contribution.html).**
+📌 **For instructions on how to use and how to contribute a node to EdgeNet, please see the [EdgeNet website](https://www.edge-net.org/pages/node-contribution.html).**
 
 ## Architecture
 
