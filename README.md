@@ -9,33 +9,48 @@
 
 ## Architecture
 
-The automated procedure for the deployment of a new EdgeNet node consists of three parts:
-1. The [bootstrap script](#bootstrap-script) which installs Ansible and runs the node playbook with `ansible-pull`.
+This repository contains the code necessary to automatically deploy an EdgeNet node.
+It consists of three parts:
+1. The [bootstrap script](#bootstrap-script) which installs Ansible and runs the node playbook with [ansible-pull](https://docs.ansible.com/ansible/latest/cli/ansible-pull.html).
 2. The [Ansible roles](#ansible-roles), which setups SSH access, containerd, Kubernetes and the EdgeNet service.
-3. The [EdgeNet service](#edgenet-service), which is run on every boot, via `systemd`, to configure the node hostname and network. It will also join the node to the cluster, if not already joined.
+3. The [EdgeNet service](#edgenet-service), which is run on every boot, via systemd, to configure the node hostname and network. It will also join the node to the cluster, if not already joined.
 
-For specific use-cases, the bootstrap script can be skipped, and the node playbook can be applied directly on the target machines with `ansible-playbook`.
+In most cases users will run the bootstrap script and wait until the node is ready.
+However, it is also possible to run the node playbook directly on the target machines with [ansible-playbook](https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html).
 
 ### Bootstrap script
 
 The [`bootstrap.sh`](/bootstrap.sh) script installs Ansible and Git, and runs the node playbook.
-The script can be configured with the following environment variables:
+It can be configured with the following environment variables:
 
-Name | Default | Description
------|---------|------------
-`EDGENET_ASK_CONFIRMATION` | 1 | Whether to ask to continue or not.
-`EDGENET_PLAYBOOK` | [edgenet-node.yml](edgenet-node.yml) | Name of the playbook to run.
-`EDGENET_REF` | main | Git reference to use.
-`EDGENET_REPOSITORY` |  https://github.com/EdgeNet-project/node.git | URL of the Git repository containing the playbook to run.
+Name                       | Default                                      | Description
+:--------------------------|:---------------------------------------------|:-----------
+`EDGENET_ASK_CONFIRMATION` | 1                                            | Whether to ask to continue or not.
+`EDGENET_PLAYBOOK`         | [edgenet-node.yml](edgenet-node.yml)         | Name of the playbook to run.
+`EDGENET_REF`              | main                                         | Git reference to use.
+`EDGENET_REPOSITORY`       |  https://github.com/EdgeNet-project/node.git | URL of the Git repository containing the playbook to run.
 
 ### Ansible roles
 
-This repository contains the following Ansible roles:
+#### [edgenet-ssh](/roles/edgenet-ssh)
 
-Name | Description | Variables | Defaults
------|-------------|-----------|---------
-[edgenet-ssh](/roles/edgenet-ssh) | Create an EdgeNet user with SSH access and passwordless sudo | `edgenet_ssh_user`, `edgenet_ssh_port_alt`, `edgenet_ssh_public_key` | [main.yml](/roles/edgenet.ssh/defaults/main.yml)
-[edgenet-kubernetes](/roles/edgenet-kubernetes) | Setup Docker and Kubernetes | `edgenet_service_state`, `containerd_version`, `kubernetes_version` | [main.yml](/roles/edgenet-kubernetes/defaults/main.yml)
+Create an EdgeNet user with SSH access and passwordless sudo.
+
+Variable                 | Default                            | Description
+:------------------------|:-----------------------------------|:-----------
+`edgenet_ssh_user`       | edgenet                            | EdgeNet SSH user
+`edgenet_ssh_port_alt`   | 25010                              | Alternative SSH port if port 22 is unavailable
+`edgenet_ssh_public_key` | [...] edgenet.planet-lab.eu (2021) | Public SSH key of the EdgeNet user
+
+#### [edgenet-kubernetes](/roles/edgenet-kubernetes)
+
+Setup Docker and Kubernetes.
+
+Variable                 | Default   | Description
+:------------------------|:----------|:-----------
+`edgenet_service_state`  | restarted | State of the EdgeNet systemd service
+`containerd_version`     | -         | containerd version to install
+`kubernetes_version`     | -         | kubernetes version to install
 
 ### EdgeNet service
 
@@ -43,6 +58,7 @@ The EdgeNet service is written in Go, in the [`main.go`](/main.go) file and the 
 
 ## Development
 
+To run the bootstrap script locally:
 ```bash
 git clone git@github.com:EdgeNet-project/node.git
 env EDGENET_REF="$(git rev-parse HEAD)" EDGENET_REPOSITORY="file://$(pwd)" ./bootstrap.sh
