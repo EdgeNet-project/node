@@ -32,10 +32,8 @@ func AssignPublicIP(localIP net.IP, publicIP net.IP) {
 	check(err)
 }
 
-// Cloud providers assign a public IP to instances through NAT.
-// The instance only sees an private _internal_ IP.
-// This is problematic for Kubernetes, which expects to see the public IP on the interface.
-// In this script, we assign the public IP to the instance interface.
+// RewritePublicIP adds iptables rules to rewrite incoming packets with the publicIP
+// and outgoing packets with the localIP. This counteracts cloud "Internet Gateway" NATs.
 func RewritePublicIP(localIP net.IP, publicIP net.IP) {
 	table, err := iptables.New()
 	check(err)

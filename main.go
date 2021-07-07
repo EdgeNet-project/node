@@ -170,6 +170,10 @@ func main() {
 	log.Printf("config=%+v\n", config)
 	config.save(edgenetConfigFile)
 
+	// Cloud providers assign a public IP to instances through NAT.
+	// The instance only sees an private _internal_ IP.
+	// This is problematic for Kubernetes, which expects to see the public IP on the interface.
+	// In this script, we assign the public IP to the instance interface.
 	if !config.LocalIPv4.Equal(config.PublicIPv4) {
 		log.Println("step=set-public-ip")
 		network.AssignPublicIP(config.LocalIPv4, config.PublicIPv4)

@@ -49,6 +49,8 @@ func configFromUrl(url string) (*rest.Config, error) {
 	return clientcmd.RESTConfigFromKubeConfig(buf)
 }
 
+// Join the node to the cluster specified by configURL.
+// It ignores AlreadyExists errors when creating the NodeContribution object.
 func Join(configURL string, externalIP net.IP, hostname string) {
 	config, err := configFromUrl(configURL)
 	check(err)

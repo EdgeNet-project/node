@@ -36,6 +36,8 @@ type GeoIPResponse struct {
 	Timezone    string  `json:"time_zone"`
 }
 
+// GeoIP returns the geographical location of the requester IP address
+// using an external service.
 func GeoIP() GeoIPResponse {
 	// NOTE: this might return an IPv6 address if the host has IPv6 connectivity.
 	resp, err := http.Get("https://freegeoip.app/json/")
@@ -50,6 +52,7 @@ func GeoIP() GeoIPResponse {
 	return geoIP
 }
 
+// PublicIPv4 returns the public IPv4 address of the requester.
 func PublicIPv4() net.IP {
 	// This service is IPv4-only.
 	resp, err := http.Get("https://api.ipify.org")
@@ -64,8 +67,9 @@ func PublicIPv4() net.IP {
 	return net.ParseIP(string(buf))
 }
 
-//https://stackoverflow.com/a/37382208
+// LocalIPv4 returns the IPv4 address configured for the main network interface.
 func LocalIPv4() net.IP {
+	//https://stackoverflow.com/a/37382208
 	conn, err := net.Dial("udp", "8.8.8.8:53")
 	if err != nil {
 		log.Fatal(err)

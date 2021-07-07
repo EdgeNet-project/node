@@ -57,6 +57,7 @@ func findLink(ip net.IP) (netlink.Link, error) {
 	return nil, fmt.Errorf("link not found for IPv%d address %s", family, ip)
 }
 
+// SetHostname sets the node hostname and update the hosts file.
 func SetHostname(hostname string) {
 	// Update /etc/hostname
 	cmd := exec.Command("hostnamectl", "set-hostname", hostname)
@@ -79,6 +80,7 @@ func SetHostname(hostname string) {
 	check(hosts.Save())
 }
 
+// SetKubeletNodeIP sets the node IP in the kubelet configuration.
 func SetKubeletNodeIP(kubeletEnvFile string, ip net.IP) {
 	// TODO: Do not override existing content?
 	s := fmt.Sprintf("KUBELET_EXTRA_ARGS=--node-ip %s\n", ip.String())
