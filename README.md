@@ -49,8 +49,9 @@ Setup Docker and Kubernetes.
 Variable                 | Default   | Description
 :------------------------|:----------|:-----------
 `edgenet_service_state`  | restarted | State of the EdgeNet systemd service
-`containerd_version`     | -         | containerd version to install
-`kubernetes_version`     | -         | kubernetes version to install
+`edgenet_node_version`   | -         | The [release](https://github.com/EdgeNet-project/node/releases) of the EdgeNet service to install
+`containerd_version`     | -         | The containerd version to install
+`kubernetes_version`     | -         | The kubernetes version to install
 
 ### EdgeNet service
 
