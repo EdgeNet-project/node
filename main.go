@@ -176,7 +176,8 @@ func main() {
 	if !config.LocalIPv4.Equal(config.PublicIPv4) {
 		log.Println("step=set-public-ip")
 		network.AssignPublicIP(config.LocalIPv4, config.PublicIPv4)
-		network.RewritePublicIP(config.LocalIPv4, config.PublicIPv4)
+		// This doesn't seems to be required anymore with Antrea (as it was with Calico).
+		// network.RewritePublicIP(config.LocalIPv4, config.PublicIPv4)
 		network.SetKubeletNodeIP(kubeletEnvFile, config.PublicIPv4)
 	}
 
