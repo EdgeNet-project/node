@@ -85,24 +85,26 @@
     value: "1000000"
     state: present
 
+# Fix an issue with CoreDNS on systems running systemd-resolved
+# See https://coredns.io/plugins/loop/#troubleshooting-loops-in-kubernetes-clusters
+- name: Check if systemd-resolved is in use
+  stat:
+    path: /run/systemd/resolve/resolv.conf
+  register: resolved_resolv_conf
+
+- name: Ensure native DNS resolvers are used
+  file:
+    src: /run/systemd/resolve/resolv.conf
+    dest: /etc/resolv.conf
+    mode: "0644"
+    state: link
+  when: resolved_resolv_conf.stat.exists
+
 - name: Ensure EdgeNet directory exists
   file:
     path: /opt/edgenet
     state: directory
     mode: "0755"
-
-# TODO: Delete this once it has been applied cluster-wide.
-- name: Ensure old EdgeNet files are absent
-  file:
-    path: "{{ item }}"
-    state: absent
-  loop:
-    - /opt/edgenet/common.sh
-    - /opt/edgenet/join-cluster.sh
-    - /opt/edgenet/update-hostname.sh
-    - /opt/edgenet/update-public-ip.sh
-    - /opt/edgenet/public.cfg
-    - /opt/edgenet/hostname
 
 - name: Ensure EdgeNet binary is present
   get_url:

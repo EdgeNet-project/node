@@ -21,7 +21,6 @@ import (
 	"github.com/EdgeNet-project/node/pkg/cluster"
 	"github.com/EdgeNet-project/node/pkg/network"
 	"github.com/EdgeNet-project/node/pkg/platforms"
-	"github.com/EdgeNet-project/node/pkg/utils"
 	"github.com/thanhpk/randstr"
 	"gopkg.in/yaml.v3"
 	"log"
@@ -179,13 +178,6 @@ func main() {
 		network.AssignPublicIP(config.LocalIPv4, config.PublicIPv4)
 		network.RewritePublicIP(config.LocalIPv4, config.PublicIPv4)
 		network.SetKubeletNodeIP(kubeletEnvFile, config.PublicIPv4)
-	}
-
-	// Fix an issue with CoreDNS on systems running systemd-resolved
-	// See https://coredns.io/plugins/loop/#troubleshooting-loops-in-kubernetes-clusters
-	if utils.Exists("/run/systemd/resolve/resolv.conf") {
-		log.Println("step=set-resolv-conf")
-		check(utils.ForceSymlink("/run/systemd/resolve/resolv.conf", "/etc/resolv.conf"))
 	}
 
 	log.Println("step=set-hostname")
