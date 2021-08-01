@@ -14,6 +14,6 @@ require (
 	github.com/yumaojun03/dmidecode v0.1.4
 	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
-	k8s.io/apimachinery v0.21.2
-	k8s.io/client-go v0.21.2
+	k8s.io/apimachinery v0.21.3
+	k8s.io/client-go v0.21.3
 )
