@@ -109,7 +109,7 @@ func getIPv4(platform string) (net.IP, net.IP) {
 	case platforms.Azure:
 		// The NIC public IP is not available through Azure metadata...
 		// https://docs.microsoft.com/en-us/answers/questions/7932/public-ip-not-available-via-metadata.html
-		localIP := net.ParseIP(platforms.AzureGetMetadata("network/interfaces/0/ipv4/ipAddress/0/privateIpAddress"))
+		localIP := net.ParseIP(platforms.AzureGetMetadata("network/interface/0/ipv4/ipAddress/0/privateIpAddress"))
 		publicIP := network.PublicIPv4()
 		return localIP, publicIP
 	case platforms.EC2:
