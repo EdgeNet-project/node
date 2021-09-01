@@ -13,7 +13,7 @@ require (
 	github.com/vishvananda/netlink v1.1.0
 	github.com/yumaojun03/dmidecode v0.1.4
 	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22
-	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
-	k8s.io/apimachinery v0.21.2
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
+	k8s.io/apimachinery v0.22.1
 	k8s.io/client-go v0.21.2
 )
