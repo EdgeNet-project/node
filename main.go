@@ -21,18 +21,25 @@ import (
 	"github.com/EdgeNet-project/node/pkg/cluster"
 	"github.com/EdgeNet-project/node/pkg/network"
 	"github.com/EdgeNet-project/node/pkg/platforms"
+	"github.com/EdgeNet-project/node/pkg/utils"
 	"github.com/thanhpk/randstr"
+	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 	"gopkg.in/yaml.v3"
 	"log"
+	"math/rand"
 	"net"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 const defaultKubeconfigURL = "https://raw.githubusercontent.com/EdgeNet-project/edgenet/master/configs/public.cfg"
+const defaultVPNNetworkV4 = "10.183.0.0/20"
+const defaultVPNNetworkV6 = "fdb4:ae86:ec99:4004::/64"
 const edgenetConfigFile = "/opt/edgenet/config.yaml"
 const kubeletEnvFile = "/etc/default/kubelet"
+const vpnLinkName = "edgenetmesh0"
 
 func check(err error) {
 	if err != nil {
@@ -55,6 +62,16 @@ type edgenetConfig struct {
 	// PublicIPv4 is the public IPv4 address of the host.
 	// This address must be reachable from the Internet.
 	PublicIPv4 net.IP `yaml:"publicIPv4"`
+	// VPNIPv4 is the private IPv4 address of the VPN mesh interface.
+	// This address must be unique among the node in the cluster.
+	VPNIPv4 *utils.IPWithMask `yaml:"vpnIPv4"`
+	// VPNIPv4 is the private IPv6 address of the VPN mesh interface.
+	// This address must be unique among the node in the cluster.
+	VPNIPv6 *utils.IPWithMask `yaml:"vpnIPv6"`
+	// VPNPrivateKey is the WireGuard private key of the VPN mesh interface.
+	VPNPrivateKey string `yaml:"vpnPrivateKey"`
+	// VPNListenPort is the WireGuard port of the VPN mesh interface.
+	VPNListenPort int `yaml:"vpnListenPort"`
 }
 
 // load the EdgeNet configuration from the specified file.
@@ -165,26 +182,57 @@ func main() {
 		config.LocalIPv4, config.PublicIPv4 = getIPv4(config.Platform)
 	}
 
+	// https://github.com/EdgeNet-project/edgenet/issues/156
+	if config.VPNIPv4 == nil || config.VPNIPv6 == nil {
+		log.Println("step=get-vpn-ip")
+		_, vpnNetworkV4, err := net.ParseCIDR(defaultVPNNetworkV4)
+		check(err)
+		_, vpnNetworkV6, err := net.ParseCIDR(defaultVPNNetworkV6)
+		check(err)
+		config.VPNIPv4, config.VPNIPv6 = cluster.FindVPNIPs(defaultKubeconfigURL, *vpnNetworkV4, *vpnNetworkV6)
+	}
+
+	if config.VPNPrivateKey == "" {
+		log.Println("step=get-vpn-private-key")
+		key, err := wgtypes.GeneratePrivateKey()
+		check(err)
+		config.VPNPrivateKey = key.String()
+	}
+
+	if config.VPNListenPort == 0 {
+		log.Println("step=get-vpn-listen-port")
+		rand.Seed(time.Now().UnixNano())
+		config.VPNListenPort = rand.Intn(32768) + 32768
+	}
+
 	log.Println("step=save-config")
 	log.Printf("config=%+v\n", config)
 	config.save(edgenetConfigFile)
-
-	// Cloud providers assign a public IP to instances through NAT.
-	// The instance only sees an private _internal_ IP.
-	// This is problematic for Kubernetes, which expects to see the public IP on the interface.
-	// In this script, we assign the public IP to the instance interface.
-	if !config.LocalIPv4.Equal(config.PublicIPv4) {
-		log.Println("step=set-public-ip")
-		network.AssignPublicIP(config.LocalIPv4, config.PublicIPv4)
-		// This doesn't seems to be required anymore with Antrea (as it was with Calico).
-		// network.RewritePublicIP(config.LocalIPv4, config.PublicIPv4)
-		network.SetKubeletNodeIP(kubeletEnvFile, config.PublicIPv4)
-	}
 
 	log.Println("step=set-hostname")
 	hostname := fmt.Sprintf("%s-%s.edge-net.io", config.HostnameRoot, config.HostnameSuffix)
 	network.SetHostname(hostname)
 
+	// https://github.com/EdgeNet-project/edgenet/issues/156
+	if config.VPNIPv4 != nil && config.VPNIPv6 != nil {
+		log.Println("step=configure-vpn")
+		network.InitializeVPN(vpnLinkName, config.VPNPrivateKey, config.VPNListenPort)
+		network.AssignVPNIP(vpnLinkName, *config.VPNIPv4, *config.VPNIPv6)
+		privateKey, err := wgtypes.ParseKey(config.VPNPrivateKey)
+		check(err)
+		cluster.CreateVPNPeer(defaultKubeconfigURL, hostname, config.PublicIPv4, config.VPNIPv4.IP, config.VPNIPv6.IP, config.VPNListenPort, privateKey.PublicKey().String())
+	}
+
+	var nodeIP net.IP
+	if config.LocalIPv4.Equal(config.PublicIPv4) {
+		nodeIP = config.PublicIPv4
+	} else {
+		nodeIP = config.VPNIPv4.IP
+	}
+
+	log.Println("step=set-node-ip")
+	network.SetKubeletNodeIP(kubeletEnvFile, nodeIP)
+
 	log.Println("step=join-cluster")
-	cluster.Join(defaultKubeconfigURL, config.PublicIPv4, hostname)
+	cluster.Join(defaultKubeconfigURL, hostname, nodeIP)
 }

@@ -105,3 +105,13 @@ func Detect() string {
 	// Fallback
 	return Generic
 }
+
+// IsCloud returns whether the platform is a cloud provider or not.
+func IsCloud(platform string) bool {
+	switch platform {
+	case Azure, EC2, GCP, SCW:
+		return true
+	default:
+		return false
+	}
+}
