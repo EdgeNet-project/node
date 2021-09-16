@@ -68,13 +68,12 @@ func Detect() string {
 
 	// GCP
 	log.Printf("try-detect=%s", GCP)
-	_, err = gcpmetadata.InstanceName()
-	if err == nil {
+	name, err := gcpmetadata.InstanceName()
+	if err == nil && name != "" {
 		return GCP
 	}
 
 	// GENI
-
 	if utils.Exists("/usr/local/etc/emulab") {
 		return GENI
 	}
