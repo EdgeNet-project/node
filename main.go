@@ -221,6 +221,11 @@ func main() {
 		privateKey, err := wgtypes.ParseKey(config.VPNPrivateKey)
 		check(err)
 		cluster.CreateVPNPeer(defaultKubeconfigURL, hostname, config.PublicIPv4, config.VPNIPv4.IP, config.VPNIPv6.IP, config.VPNListenPort, privateKey.PublicKey().String())
+		// Pre-establish the tunnels before the VPNPeer controller gets started.
+		peers := cluster.ListVPNPeer(defaultKubeconfigURL)
+		for _, peer := range peers {
+			network.AddPeer(vpnLinkName, peer)
+		}
 	}
 
 	var nodeIP net.IP

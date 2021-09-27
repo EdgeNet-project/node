@@ -52,15 +52,9 @@ func configFromUrl(url string) (*rest.Config, error) {
 }
 
 func FindVPNIPs(configURL string, netv4 net.IPNet, netv6 net.IPNet) (*utils.IPWithMask, *utils.IPWithMask) {
-	config, err := configFromUrl(configURL)
-	check(err)
-	clientset, err := versioned.NewForConfig(config)
-	check(err)
-	client := clientset.NetworkingV1alpha().VPNPeers()
-	peers, err := client.List(context.TODO(), metav1.ListOptions{})
-	check(err)
+	peers := ListVPNPeer(configURL)
 	usedIPs := make([]net.IP, 0)
-	for _, peer := range peers.Items {
+	for _, peer := range peers {
 		usedIPs = append(usedIPs, net.ParseIP(peer.Spec.AddressV4))
 	}
 	ipv4 := utils.RandIPv4(netv4, usedIPs)
@@ -97,6 +91,17 @@ func CreateVPNPeer(configURL string, hostname string, externalIP net.IP, ipv4 ne
 	} else {
 		log.Print("vpn-peer-status=created")
 	}
+}
+
+func ListVPNPeer(configURL string) []v1alpha2.VPNPeer {
+	config, err := configFromUrl(configURL)
+	check(err)
+	clientset, err := versioned.NewForConfig(config)
+	check(err)
+	client := clientset.NetworkingV1alpha().VPNPeers()
+	peers, err := client.List(context.TODO(), metav1.ListOptions{})
+	check(err)
+	return peers.Items
 }
 
 // Join the node to the cluster specified by configURL.
