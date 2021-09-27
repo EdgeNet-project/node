@@ -68,13 +68,12 @@ func Detect() string {
 
 	// GCP
 	log.Printf("try-detect=%s", GCP)
-	_, err = gcpmetadata.InstanceName()
-	if err == nil {
+	name, err := gcpmetadata.InstanceName()
+	if err == nil && name != "" {
 		return GCP
 	}
 
 	// GENI
-
 	if utils.Exists("/usr/local/etc/emulab") {
 		return GENI
 	}
@@ -104,4 +103,14 @@ func Detect() string {
 
 	// Fallback
 	return Generic
+}
+
+// IsCloud returns whether the platform is a cloud provider or not.
+func IsCloud(platform string) bool {
+	switch platform {
+	case Azure, EC2, GCP, SCW:
+		return true
+	default:
+		return false
+	}
 }
