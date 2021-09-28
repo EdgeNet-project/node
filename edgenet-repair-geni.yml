@@ -1,0 +1,34 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    # Fix grubby fatal error when updating the kernel:
+    # https://serverfault.com/questions/673486/grubby-fatal-error-unable-to-find-a-suitable-template
+    - name: Regenerate grub2 configuration
+      tags: ['skip_ansible_lint']
+      command: grub2-mkconfig -o /boot/grub2/grub.cfg
+      when: ansible_os_family == 'RedHat'
+
+    - name: Ensure kernel-devel is installed and up-to-date
+      yum:
+        name: kernel-devel
+        state: latest
+      when: ansible_os_family == 'RedHat'
+
+    - name: Ensure kernel is up-to-date
+      yum:
+        name: kernel
+        state: latest
+      when: ansible_os_family == 'RedHat'
+
+    # Fix "Error: failed to create containerd container: get apparmor_parser version: exec: "apparmor_parser": executable file not found in $PATH"
+    - name: Ensure apparmor is installed and up-to-date
+      apt:
+        name:
+          - apparmor
+          - apparmor-utils
+        state: latest
+      when: ansible_os_family == 'Debian'
+
+    - name: Reboot the machine
+      reboot:

@@ -15,7 +15,9 @@
 
 - name: Ensure the WireGuard kernel module is installed (CentOS, RHEL)
   yum:
-    name: kmod-wireguard
+    name:
+      - kernel-devel
+      - kmod-wireguard
     state: present
   when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 

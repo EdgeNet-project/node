@@ -17,12 +17,33 @@
     baseurl: "{{ kubernetes_yum_repo_url }}"
     gpgkey: "{{ kubernetes_yum_gpg_key }}"
 
-- name: Ensure Kubernetes packages are installed
+- name: Ensure Kubernetes is not version-locked
+  lineinfile:
+    path: /etc/yum/pluginconf.d/versionlock.list
+    line: "{{ item }}"
+    state: absent
+  loop:
+    - "0:kubeadm*"
+    - "0:kubectl*"
+    - "0:kubelet*"
+
+- name: Ensure Kubernetes packages are installed and up-to-date
+  tags: ['skip_ansible_lint']
   yum:
     name:
       - "kubeadm-*{{ kubernetes_version }}*"
       - "kubectl-*{{ kubernetes_version }}*"
       - "kubelet-*{{ kubernetes_version }}*"
-    state: present
+    state: latest
     update_cache: true
   notify: restart kubelet
+
+- name: Ensure Kubernetes is version-locked
+  lineinfile:
+    path: /etc/yum/pluginconf.d/versionlock.list
+    line: "{{ item }}"
+    state: present
+  loop:
+    - "0:kubeadm*"
+    - "0:kubectl*"
+    - "0:kubelet*"

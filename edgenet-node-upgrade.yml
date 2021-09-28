@@ -29,5 +29,4 @@
       yum:
         name: '*'
         state: latest
-        exclude: kernel*,kube*,containerd*
       when: ansible_os_family == 'RedHat'

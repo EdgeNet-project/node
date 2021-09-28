@@ -26,7 +26,7 @@
     dest: /etc/apt/preferences.d/containerd
     mode: 0644
 
-- name: Ensure containerd is installed
+- name: Ensure containerd is installed and up-to-date
   apt:
     name: "containerd.io={{ containerd_version }}*"
     state: present

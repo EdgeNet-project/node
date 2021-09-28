@@ -29,6 +29,12 @@
     content: 'Acquire::ForceIPv4 "true";'
   when: ansible_os_family == 'Debian'
 
+- name: Ensure `yum-versionlock` is installed
+  yum:
+    name: 'yum-versionlock'
+    state: present
+  when: ansible_os_family == 'RedHat'
+
 - name: Install containerd
   include_tasks: containerd.yml
 

@@ -26,7 +26,7 @@
     dest: /etc/apt/preferences.d/kubernetes
     mode: 0644
 
-- name: Ensure Kubernetes packages are installed
+- name: Ensure Kubernetes packages are installed and up-to-date
   apt:
     name:
       - "kubeadm={{ kubernetes_version }}*"
