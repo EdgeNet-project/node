@@ -124,23 +124,21 @@ func getHostnameRoot(platform string) string {
 func getIPv4(platform string) (net.IP, net.IP) {
 	switch platform {
 	case platforms.Azure:
-		// The NIC public IP is not available through Azure metadata...
-		// https://docs.microsoft.com/en-us/answers/questions/7932/public-ip-not-available-via-metadata.html
 		localIP := net.ParseIP(platforms.AzureGetMetadata("network/interface/0/ipv4/ipAddress/0/privateIpAddress"))
 		publicIP := network.PublicIPv4()
 		return localIP, publicIP
 	case platforms.EC2:
 		localIP := net.ParseIP(platforms.EC2GetMetadata("local-ipv4"))
-		publicIP := net.ParseIP(platforms.EC2GetMetadata("public-ipv4"))
+		publicIP := network.PublicIPv4()
 		return localIP, publicIP
 	case platforms.GCP:
 		localIP := net.ParseIP(platforms.GCPGetMetadata("instance/network-interfaces/0/ip"))
-		publicIP := net.ParseIP(platforms.GCPGetMetadata("instance/network-interfaces/0/access-configs/0/external-ip"))
+		publicIP := network.PublicIPv4()
 		return localIP, publicIP
 	case platforms.SCW:
 		meta := platforms.SCWGetMetadata()
 		localIP := net.ParseIP(meta.PrivateIP)
-		publicIP := net.ParseIP(meta.PublicIP.Address)
+		publicIP := network.PublicIPv4()
 		return localIP, publicIP
 	default:
 		localIP := network.LocalIPv4()
