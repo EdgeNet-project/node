@@ -23,6 +23,7 @@ import (
 	"golang.org/x/sys/unix"
 	"golang.zx2c4.com/wireguard/wgctrl"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
+	"log"
 	"net"
 	"time"
 )
@@ -77,8 +78,14 @@ func AssignVPNIP(name string, ipv4 utils.IPWithMask, ipv6 utils.IPWithMask) {
 		}
 	}
 
-	check(netlink.AddrReplace(link, addr4))
-	check(netlink.AddrReplace(link, addr6))
+	err = netlink.AddrReplace(link, addr4)
+	if err != nil {
+		log.Printf("Failed to set IPv4 for link %s: %s\n", name, err)
+	}
+	err = netlink.AddrReplace(link, addr6)
+	if err != nil {
+		log.Printf("Failed to set IPv6 for link %s: %s\n", name, err)
+	}
 }
 
 func AddPeer(name string, peer v1alpha.VPNPeer) {
