@@ -3,7 +3,7 @@
 - name: Ensure swap is disabled on boot
   replace:
     path: /etc/fstab
-    regexp: '^\s*[^#](.+swap\s+swap.+)$'
+    regexp: '^\s*[^#](.+swap.+)$'
     replace: '# \1'
     backup: true
 
