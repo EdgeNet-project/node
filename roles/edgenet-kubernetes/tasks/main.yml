@@ -1,18 +1,9 @@
 ---
-# Kubernetes requires swap to be disabled.
-- name: Ensure swap is disabled on boot
-  replace:
-    path: /etc/fstab
-    regexp: '^\s*[^#](.+swap.+)$'
-    replace: '# \1'
-    backup: true
-
-- name: Ensure swap is disabled for the session
-  tags: ['skip_ansible_lint']
-  command: swapoff -a
+- name: Disable swap
+  include_tasks: swap.yml
 
 # This is to simplify future Ansible calls, since by default
-# it uses /usr/bin/python which does not exists on Ubuntu.
+# it uses /usr/bin/python which does not exist on Ubuntu.
 - name: Ensure python is python3 on Ubuntu
   apt:
     name: python-is-python3

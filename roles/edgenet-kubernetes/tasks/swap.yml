@@ -1,0 +1,22 @@
+- name: List systemd swap units
+  tags: ['skip_ansible_lint']
+  shell: systemctl --type swap | awk '$1 ~ /\.swap/ { print $1 }'
+  register: systemd_swap
+
+- name: Ensure systemd swap units are masked and stopped
+  systemd:
+    name: "{{ item }}"
+    masked: true
+    state: stopped
+  loop: "{{ systemd_swap.stdout_lines }}"
+
+- name: Ensure swap is disabled on boot
+  replace:
+    path: /etc/fstab
+    regexp: '^\s*[^#](.+swap.+)$'
+    replace: '# \1'
+    backup: true
+
+- name: Ensure swap is disabled for the session
+  tags: ['skip_ansible_lint']
+  command: swapoff -a
