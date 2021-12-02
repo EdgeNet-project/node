@@ -5,7 +5,7 @@ go 1.16
 require (
 	cloud.google.com/go v0.97.0
 	github.com/EdgeNet-project/edgenet v1.0.0-alpha.1.0.20210913151028-60f26ffd5fb3
-	github.com/aws/aws-sdk-go v1.41.15
+	github.com/aws/aws-sdk-go v1.42.16
 	github.com/coreos/go-iptables v0.6.0
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.7
 	github.com/thanhpk/randstr v1.0.4
