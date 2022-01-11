@@ -55,6 +55,13 @@ func Detect() string {
 		return Azure
 	}
 
+	// OpenStack
+	log.Printf("try-detect=OpenStack")
+	res, err = client.Get("http://169.254.169.254/openstack")
+	if err == nil && res.StatusCode != 404 {
+		return Generic
+	}
+
 	// EC2
 	log.Printf("try-detect=%s", EC2)
 	awsconfig := aws.NewConfig().WithHTTPClient(&client).WithMaxRetries(0)
