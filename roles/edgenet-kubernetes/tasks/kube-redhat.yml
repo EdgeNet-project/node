@@ -17,15 +17,29 @@
     baseurl: "{{ kubernetes_yum_repo_url }}"
     gpgkey: "{{ kubernetes_yum_gpg_key }}"
 
-- name: Ensure Kubernetes is not version-locked
+# TODO: Proper dnf/yum detection
+- name: Ensure Kubernetes is not version-locked (yum)
   lineinfile:
     path: /etc/yum/pluginconf.d/versionlock.list
     line: "{{ item }}"
     state: absent
+  ignore_errors: true
   loop:
     - "0:kubeadm*"
     - "0:kubectl*"
     - "0:kubelet*"
+
+- name: Ensure Kubernetes is not version-locked (dnf)
+  lineinfile:
+    path: /etc/dnf/plugins/versionlock.list
+    line: "{{ item }}"
+    state: absent
+  ignore_errors: true
+  loop:
+    - "0:kubeadm*"
+    - "0:kubectl*"
+    - "0:kubelet*"
+
 
 - name: Ensure Kubernetes packages are installed and up-to-date
   tags: ['skip_ansible_lint']
@@ -38,11 +52,23 @@
     update_cache: true
   notify: restart kubelet
 
-- name: Ensure Kubernetes is version-locked
+- name: Ensure Kubernetes is version-locked (yum)
   lineinfile:
     path: /etc/yum/pluginconf.d/versionlock.list
     line: "{{ item }}"
     state: present
+  ignore_errors: true
+  loop:
+    - "0:kubeadm*"
+    - "0:kubectl*"
+    - "0:kubelet*"
+
+- name: Ensure Kubernetes is version-locked (dnf)
+  lineinfile:
+    path: /etc/dnf/plugins/versionlock.list
+    line: "{{ item }}"
+    state: present
+  ignore_errors: true
   loop:
     - "0:kubeadm*"
     - "0:kubectl*"
