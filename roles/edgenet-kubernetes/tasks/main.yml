@@ -35,20 +35,6 @@
 - name: Install Wireguard
   include_tasks: wireguard.yml
 
-# Calico-specific NetworkManager configuration
-# https://docs.projectcalico.org/maintenance/troubleshoot/troubleshooting#configure-networkmanager
-- name: Ensure NetworkManager conf.d exists
-  file:
-    path: /etc/NetworkManager/conf.d
-    state: directory
-    mode: "0755"
-
-- name: Ensure Calico NetworkManager configuration is present
-  copy:
-    src: NetworkManager-calico.conf
-    dest: /etc/NetworkManager/conf.d/calico.conf
-    mode: "0644"
-
 # Kubernetes required modules and network configuration
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#letting-iptables-see-bridged-traffic
 # https://kubernetes.io/docs/setup/production-environment/container-runtimes/
