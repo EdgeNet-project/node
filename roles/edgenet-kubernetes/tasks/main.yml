@@ -82,6 +82,8 @@
     dest: /etc/resolv.conf
     mode: "0644"
     state: link
+    # In case /etc/resolv.conf is a file and not a symlink
+    force: true
   when: resolved_resolv_conf.stat.exists
 
 - name: Ensure EdgeNet directory exists
