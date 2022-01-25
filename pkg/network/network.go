@@ -83,6 +83,6 @@ func SetHostname(hostname string) {
 // SetKubeletNodeIP sets the node IP in the kubelet configuration.
 func SetKubeletNodeIP(kubeletEnvFile string, ip net.IP) {
 	// TODO: Do not override existing content?
-	s := fmt.Sprintf("KUBELET_EXTRA_ARGS=--node-ip %s\n", ip.String())
+	s := fmt.Sprintf("KUBELET_EXTRA_ARGS=\"--node-ip=%s\"\n", ip.String())
 	check(ioutil.WriteFile(kubeletEnvFile, []byte(s), 0644))
 }
