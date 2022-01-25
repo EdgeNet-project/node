@@ -17,12 +17,14 @@ limitations under the License.
 package network
 
 import (
+	"errors"
 	"fmt"
 	"github.com/txn2/txeh"
 	"github.com/vishvananda/netlink"
 	"golang.org/x/sys/unix"
 	"io/ioutil"
 	"net"
+	"os"
 	"os/exec"
 	"strings"
 )
@@ -82,6 +84,9 @@ func SetHostname(hostname string) {
 
 // SetKubeletNodeIP sets the node IP in the kubelet configuration.
 func SetKubeletNodeIP(kubeletEnvFile string, ip net.IP) {
+	if _, err := os.Stat(kubeletEnvFile); errors.Is(err, os.ErrNotExist) {
+		return
+	}
 	// TODO: Do not override existing content?
 	s := fmt.Sprintf("KUBELET_EXTRA_ARGS=\"--node-ip=%s\"\n", ip.String())
 	check(ioutil.WriteFile(kubeletEnvFile, []byte(s), 0644))
