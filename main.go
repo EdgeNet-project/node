@@ -18,13 +18,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/EdgeNet-project/node/pkg/cluster"
-	"github.com/EdgeNet-project/node/pkg/network"
-	"github.com/EdgeNet-project/node/pkg/platforms"
-	"github.com/EdgeNet-project/node/pkg/utils"
-	"github.com/thanhpk/randstr"
-	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
-	"gopkg.in/yaml.v3"
 	"log"
 	"math/rand"
 	"net"
@@ -32,6 +25,14 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/EdgeNet-project/node/pkg/cluster"
+	"github.com/EdgeNet-project/node/pkg/network"
+	"github.com/EdgeNet-project/node/pkg/platforms"
+	"github.com/EdgeNet-project/node/pkg/utils"
+	"github.com/thanhpk/randstr"
+	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
+	"gopkg.in/yaml.v3"
 )
 
 const defaultKubeconfigURL = "https://raw.githubusercontent.com/EdgeNet-project/edgenet/master/configs/public.cfg"
@@ -237,6 +238,10 @@ func main() {
 	log.Println("step=set-node-ip")
 	network.SetKubeletNodeIP(kubeletEnvFileDebian, nodeIP)
 	network.SetKubeletNodeIP(kubeletEnvFileRedHat, nodeIP)
+
+	log.Println("step=set-node-pressure-eviction")
+	cluster.SetKubeletNodePressureEviction(kubeletEnvFileDebian)
+	cluster.SetKubeletNodePressureEviction(kubeletEnvFileRedHat)
 
 	log.Println("step=join-cluster")
 	cluster.Join(defaultKubeconfigURL, hostname, nodeIP)

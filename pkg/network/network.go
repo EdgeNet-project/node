@@ -19,14 +19,15 @@ package network
 import (
 	"errors"
 	"fmt"
-	"github.com/txn2/txeh"
-	"github.com/vishvananda/netlink"
-	"golang.org/x/sys/unix"
 	"io/ioutil"
 	"net"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/txn2/txeh"
+	"github.com/vishvananda/netlink"
+	"golang.org/x/sys/unix"
 )
 
 func check(err error) {
