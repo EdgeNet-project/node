@@ -59,11 +59,26 @@ The EdgeNet service is written in Go, in the [`main.go`](/main.go) file and the 
 
 ## Development
 
-To run the bootstrap script locally:
+#### Run the local bootstrap script with the local Ansible playbook
+
 ```bash
 git clone git@github.com:EdgeNet-project/node.git
 env EDGENET_REF="$(git rev-parse HEAD)" EDGENET_REPOSITORY="file://$(pwd)" ./bootstrap.sh
 ```
+
+#### Use the Ansible playbook from a specific branch
+
+```bash
+export EDGENET_REF=my-branch
+bash -ci "$(wget -O - https://raw.githubusercontent.com/EdgeNet-project/node/main/bootstrap.sh)"
+```
+
+#### Update the node binary
+
+1. Create a GitHub release and wait for the completion of the associated workflow
+2. Update `edgenet_node_version` in [vars/edgenet-production.yml](https://github.com/EdgeNet-project/node/blob/main/vars/edgenet-production.yml)
+
+Alternatively, for debugging, you can compile the node binary locally and directly upload it to `/opt/edgenet/node` on the remote node.
 
 ## Cluster-wide play
 
