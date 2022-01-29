@@ -22,16 +22,19 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/EdgeNet-project/edgenet/pkg/apis/core/v1alpha"
 	v1alpha2 "github.com/EdgeNet-project/edgenet/pkg/apis/networking/v1alpha"
 	"github.com/EdgeNet-project/edgenet/pkg/generated/clientset/versioned"
 	"github.com/EdgeNet-project/node/pkg/utils"
+	"gopkg.in/yaml.v3"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	kubeletconfigv1beta1 "k8s.io/kubelet/config/v1beta1"
 )
 
 func check(err error) {
@@ -136,29 +139,40 @@ func Join(configURL string, hostname string, externalIP net.IP) {
 }
 
 // SetKubeletNodePressureEviction sets the eviction thresholds, system reserved resources and minimum reclaim in the kubelet configuration.
-func SetKubeletNodePressureEviction(kubeletEnvFile string) {
-	if dat, err := ioutil.ReadFile(kubeletEnvFile); err == nil {
-		// TODO: Set these parameters via the config file specified by the Kubelet's --config flag.
-		// https://kubernetes.io/docs/tasks/administer-cluster/kubelet-config-file/
-		// TODO: Dynamically assign system reserved memory as 10% (X%) of the capacity.
-		kubeletConfig := string(dat)
+func SetKubeletNodePressureEviction(kubeletConfigFile string) {
+	// TODO: Periodically check if the kubelet config is created with timeout.
+	var config kubeletconfigv1beta1.KubeletConfiguration
 
-		splitFn := func(c rune) bool {
-			return c == '"'
-		}
-		split := strings.FieldsFunc(kubeletConfig, splitFn)
-
-		parameters := "--eviction-hard=memory.available<250Mi,nodefs.available<10%%,imagefs.available<15%% --system-reserved=cpu=200m,memory=500Mi --eviction-minimum-reclaim=memory.available=0Mi,nodefs.available=500Mi,imagefs.available=2Gi "
-		for key, value := range split {
-			if key == 0 {
-				kubeletConfig = value + "\"" + parameters
-			} else if key != len(split)-1 {
-				kubeletConfig += value
-			} else {
-				kubeletConfig += value + "\"\n"
-			}
-		}
-
-		check(ioutil.WriteFile(kubeletEnvFile, []byte(kubeletConfig), 0644))
+	file, err := os.Open(kubeletConfigFile)
+	if err != nil {
+		log.Printf("Kubelet Config Open: unexpected error executing command: %v", err)
+		return
 	}
+	defer file.Close()
+
+	decoder := yaml.NewDecoder(file)
+	err = decoder.Decode(&config)
+	if err != nil {
+		log.Printf("Kubelet Config Decode: unexpected error executing command: %v", err)
+		return
+	}
+
+	config.EvictionHard["memory.available"] = "250Mi"
+	// TODO: Add eviction soft
+	// TODO: Dynamically assign system reserved memory as 10% (X%) of the capacity.
+	config.SystemReserved["memory"] = "500Mi"
+	config.SystemReserved["cpu"] = "200m"
+
+	config.EvictionMinimumReclaim["memory"] = "0Mi"
+	config.EvictionMinimumReclaim["nodefs.available"] = "500Mi"
+	config.EvictionMinimumReclaim["imagefs.available"] = "2Gi"
+
+	encoder := yaml.NewEncoder(file)
+	err = encoder.Encode(config)
+	if err != nil {
+		log.Printf("Kubelet Config Encode: unexpected error executing command: %v", err)
+		return
+	}
+
+	// TODO: Restart kubelet: systemctl daemon-reload && systemctl restart kubelet
 }

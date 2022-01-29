@@ -39,6 +39,7 @@ const defaultKubeconfigURL = "https://raw.githubusercontent.com/EdgeNet-project/
 const defaultVPNNetworkV4 = "10.183.0.0/20"
 const defaultVPNNetworkV6 = "fdb4:ae86:ec99:4004::/64"
 const edgenetConfigFile = "/opt/edgenet/config.yaml"
+const kubeletConfigFile = "/var/lib/kubelet/config.yaml"
 const kubeletEnvFileDebian = "/etc/default/kubelet"
 const kubeletEnvFileRedHat = "/etc/sysconfig/kubelet"
 const vpnLinkName = "edgenetmesh0"
@@ -239,10 +240,9 @@ func main() {
 	network.SetKubeletNodeIP(kubeletEnvFileDebian, nodeIP)
 	network.SetKubeletNodeIP(kubeletEnvFileRedHat, nodeIP)
 
-	log.Println("step=set-node-pressure-eviction")
-	cluster.SetKubeletNodePressureEviction(kubeletEnvFileDebian)
-	cluster.SetKubeletNodePressureEviction(kubeletEnvFileRedHat)
-
 	log.Println("step=join-cluster")
 	cluster.Join(defaultKubeconfigURL, hostname, nodeIP)
+
+	log.Println("step=set-node-pressure-eviction")
+	cluster.SetKubeletNodePressureEviction(kubeletConfigFile)
 }
