@@ -15,6 +15,6 @@ require (
 	golang.org/x/sys v0.0.0-20211210111614-af8b64212486
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20210506160403-92e472f520a5
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
-	k8s.io/apimachinery v0.23.3
-	k8s.io/client-go v0.23.3
+	k8s.io/apimachinery v0.23.4
+	k8s.io/client-go v0.23.4
 )
