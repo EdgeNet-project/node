@@ -7,7 +7,7 @@ require (
 	github.com/EdgeNet-project/edgenet v1.0.0-alpha.1.0.20210913151028-60f26ffd5fb3
 	github.com/aws/aws-sdk-go v1.43.9
 	github.com/coreos/go-iptables v0.6.0
-	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.7
+	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.9
 	github.com/thanhpk/randstr v1.0.4
 	github.com/txn2/txeh v1.3.0
 	github.com/vishvananda/netlink v1.1.1-0.20210530105856-14e832ae1e8f
