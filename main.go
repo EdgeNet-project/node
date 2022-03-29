@@ -34,7 +34,6 @@ import (
 	"time"
 )
 
-const defaultKubeconfigURL = "https://raw.githubusercontent.com/EdgeNet-project/edgenet/master/configs/public.cfg"
 const defaultVPNNetworkV4 = "10.183.0.0/20"
 const defaultVPNNetworkV6 = "fdb4:ae86:ec99:4004::/64"
 const edgenetConfigFile = "/opt/edgenet/config.yaml"
@@ -157,10 +156,6 @@ func main() {
 	config.load(edgenetConfigFile)
 	log.Printf("config=%+v\n", config)
 
-	if config.KubeconfigURL == "" {
-		config.KubeconfigURL = defaultKubeconfigURL
-	}
-
 	if config.Platform == "" {
 		log.Println("step=detect-platform")
 		config.Platform = platforms.Detect()
@@ -188,7 +183,7 @@ func main() {
 		check(err)
 		_, vpnNetworkV6, err := net.ParseCIDR(defaultVPNNetworkV6)
 		check(err)
-		config.VPNIPv4, config.VPNIPv6 = cluster.FindVPNIPs(defaultKubeconfigURL, *vpnNetworkV4, *vpnNetworkV6)
+		config.VPNIPv4, config.VPNIPv6 = cluster.FindVPNIPs(config.KubeconfigURL, *vpnNetworkV4, *vpnNetworkV6)
 	}
 
 	if config.VPNPrivateKey == "" {
@@ -219,9 +214,9 @@ func main() {
 		network.AssignVPNIP(vpnLinkName, *config.VPNIPv4, *config.VPNIPv6)
 		privateKey, err := wgtypes.ParseKey(config.VPNPrivateKey)
 		check(err)
-		cluster.CreateVPNPeer(defaultKubeconfigURL, hostname, config.PublicIPv4, config.VPNIPv4.IP, config.VPNIPv6.IP, config.VPNListenPort, privateKey.PublicKey().String())
+		cluster.CreateVPNPeer(config.KubeconfigURL, hostname, config.PublicIPv4, config.VPNIPv4.IP, config.VPNIPv6.IP, config.VPNListenPort, privateKey.PublicKey().String())
 		// Pre-establish the tunnels before the VPNPeer controller gets started.
-		peers := cluster.ListVPNPeer(defaultKubeconfigURL)
+		peers := cluster.ListVPNPeer(config.KubeconfigURL)
 		for _, peer := range peers {
 			network.AddPeer(vpnLinkName, peer)
 		}
@@ -239,5 +234,5 @@ func main() {
 	network.SetKubeletNodeIP(kubeletEnvFileRedHat, nodeIP)
 
 	log.Println("step=join-cluster")
-	cluster.Join(defaultKubeconfigURL, hostname, nodeIP)
+	cluster.Join(config.KubeconfigURL, hostname, nodeIP)
 }

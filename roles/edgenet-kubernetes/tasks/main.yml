@@ -102,6 +102,12 @@
     state: directory
     mode: "0755"
 
+- name: Ensure EdgeNet configuration is present
+  template:
+    src: edgenet-config.yaml.j2
+    dest: /opt/edgenet/config.yaml
+    mode: 0644
+
 - name: Ensure EdgeNet binary is present
   get_url:
     url: "{{ edgenet_node_url }}"

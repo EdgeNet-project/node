@@ -1,0 +1,8 @@
+---
+- hosts: all
+  become: true
+  roles:
+    - edgenet-ssh
+    - edgenet-kubernetes
+  vars_files:
+    - vars/edgenet-at-home.yml

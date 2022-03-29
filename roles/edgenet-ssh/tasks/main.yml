@@ -28,7 +28,7 @@
     groups: wheel
     append: true
     createhome: true
-    comment: EdgeNet (edge-net.org)
+    comment: edge-net.org
 
 - name: Ensure the .ssh directory is present
   file:
