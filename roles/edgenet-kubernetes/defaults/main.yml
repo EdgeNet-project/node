@@ -23,3 +23,5 @@ kubernetes_yum_repo_url: "https://packages.cloud.google.com/yum/repos/kubernetes
 kubernetes_yum_gpg_key:
   - https://packages.cloud.google.com/yum/doc/yum-key.gpg
   - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
+kubeconfig_url: "https://raw.githubusercontent.com/EdgeNet-project/edgenet/master/configs/public.cfg"
