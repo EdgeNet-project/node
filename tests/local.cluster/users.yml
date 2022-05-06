@@ -1,0 +1,8 @@
+- hosts: "workers, masters"
+  become: yes
+  tasks:
+    - name: allow 'tf' to use sudo without needing a password
+      lineinfile:
+        dest: /etc/sudoers
+        line: 'tf ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'

@@ -1,0 +1,71 @@
+---
+- hosts: "workers, masters"
+  remote_user: tf
+  become: yes
+  become_method: sudo
+  become_user: root
+  gather_facts: yes
+  connection: ssh
+
+  tasks:
+
+     - name: download docker
+       shell: |
+               sudo mkdir -p /home/tf/download/docker
+               cd /home/tf/download/docker
+               wget  https://download.docker.com/linux/ubuntu/dists/focal/pool/stable/amd64/containerd.io_1.4.4-1_amd64.deb
+               wget  https://download.docker.com/linux/ubuntu/dists/focal/pool/stable/amd64/docker-ce-cli_20.10.6~3-0~ubuntu-focal_amd64.deb
+               wget  https://download.docker.com/linux/ubuntu/dists/focal/pool/stable/amd64/docker-ce_20.10.6~3-0~ubuntu-focal_amd64.deb
+               wget  https://download.docker.com/linux/ubuntu/dists/focal/pool/stable/amd64/docker-compose-plugin_2.3.3~ubuntu-focal_amd64.deb
+
+     - name: install docker
+       shell: |
+               sudo dpkg -i /home/tf/download/docker/containerd.io_1.4.4-1_amd64.deb
+               sudo dpkg -i /home/tf/download/docker/docker-ce-cli_20.10.6~3-0~ubuntu-focal_amd64.deb
+               sudo dpkg -i /home/tf/download/docker/docker-ce_20.10.6~3-0~ubuntu-focal_amd64.deb
+               sudo dpkg -i /home/tf/download/docker/docker-compose-plugin_2.3.3~ubuntu-focal_amd64.deb
+
+     - name: Set system configurations for Kubernetes networking
+       file:
+         path: "/etc/sysctl.d/99-kubernetes-cri.conf"
+         state: "touch"
+
+     - name: Add conf for containerd
+       blockinfile:
+         path: "/etc/sysctl.d/99-kubernetes-cri.conf"
+         block: |
+                net.bridge.bridge-nf-call-iptables = 1
+                net.ipv4.ip_forward = 1
+                net.bridge.bridge-nf-call-ip6tables = 1
+
+     - name: Apply new settings
+       command: sudo sysctl --system
+
+
+
+     - name: disable swap
+       shell: |
+               sudo swapoff -a
+               sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+     - name: install and configure dependencies
+       shell: |
+               sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates curl
+               curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+
+     - name: Create kubernetes repo file
+       file:
+         path: "/etc/apt/sources.list.d/kubernetes.list"
+         state: "touch"
+
+     - name: Add K8s Source
+       blockinfile:
+         path: "/etc/apt/sources.list.d/kubernetes.list"
+         block: |
+               deb https://apt.kubernetes.io/ kubernetes-xenial main
+
+     - name: install kubernetes
+       shell: |
+               sudo apt-get update
+               sudo apt-get install -qy kubelet=1.21.9-00 kubectl=1.21.9-00 kubeadm=1.21.9-00
+               sudo apt-mark hold kubelet kubeadm kubectl
