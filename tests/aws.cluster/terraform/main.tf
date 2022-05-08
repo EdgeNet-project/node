@@ -108,7 +108,7 @@ EOF
   subnet_id = each.value.subnet_id
   key_name  = each.value.key_name
   tags = {
-    Name = "edgenet-test"
+    Name = "${each.value.instance_name}"
   }
 }
 
