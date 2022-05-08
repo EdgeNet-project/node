@@ -13,6 +13,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Before running the script:
+# - Set public_key path/filename retrieved from ~/.ssh in your laptop for "with_file" in tests/aws.cluster/ansible/users.yml
+# - Add new file /tmp/hosts, set with remote servers public ips and username (public ips can be get from aws cli: aws ec2 describe-instances --query "Reservations[].Instances[].PublicIpAddress"), contents should be as below:
+
+#     [masters]
+#     kub0 ansible_host=174.129.149.206 ansible_connection=ssh ansible_user=ubuntu
+#     ...
+#     [workers]
+#     kub1 ansible_host=3.82.242.101 ansible_connection=ssh ansible_user=ubuntu
+#     kub1 ansible_host=3.82.242.101 ansible_connection=ssh ansible_user=ubuntu
+#     ...
+# Run the command:
+# env HOST_FILE="file://<absolute path/file of your hosts touched at previous step>" ./bootstrap.aws.test.sh
+# e.g. env HOST_FILE="file:///tmp/hosts" ./bootstrap.aws.test.sh
+
 set -eu
 
 # To override one of these settings, set the appropriate environment variable.
