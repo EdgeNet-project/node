@@ -110,11 +110,13 @@ esac
 # Run the node playbook.
 # hosts file contents: 
 # [masters]
-# [masters]
 # kub0 ansible_host=174.129.149.206 ansible_connection=ssh ansible_user=ubuntu
 # [workers]
 # kub1 ansible_host=3.82.242.101 ansible_connection=ssh ansible_user=ubuntu
 # kub1 ansible_host=3.82.242.101 ansible_connection=ssh ansible_user=ubuntu
+HOST_FILE="/tmp/hosts"
 
-ansible-pull --accept-host-key --extra-vars "ansible_python_interpreter=${PYTHON}" --inventory "${HOST_FILE}", \
-  --checkout "${EDGENET_REF}" --url "${EDGENET_REPOSITORY}" "${EDGENET_PLAYBOOK}"
+# ansible-pull --accept-host-key --extra-vars "ansible_python_interpreter=${PYTHON}" --inventory "${HOST_FILE}", \
+#   --checkout "${EDGENET_REF}" --url "${EDGENET_REPOSITORY}" "${EDGENET_PLAYBOOK}"
+
+ansible-playbook -i "${HOST_FILE}" "${EDGENET_PLAYBOOK}"
