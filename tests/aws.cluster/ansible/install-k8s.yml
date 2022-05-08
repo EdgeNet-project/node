@@ -1,6 +1,6 @@
 ---
-- hosts: "workers, masters"
-  remote_user: tf
+- hosts: "masters, workers"
+  remote_user: ubuntu
   become: yes
   become_method: sudo
   become_user: root
@@ -11,8 +11,8 @@
 
      - name: download docker
        shell: |
-               sudo mkdir -p /home/tf/download/docker
-               cd /home/tf/download/docker
+               sudo mkdir -p /home/ubuntu/download/docker
+               cd /home/ubuntu/download/docker
                wget  https://download.docker.com/linux/ubuntu/dists/focal/pool/stable/amd64/containerd.io_1.4.4-1_amd64.deb
                wget  https://download.docker.com/linux/ubuntu/dists/focal/pool/stable/amd64/docker-ce-cli_20.10.6~3-0~ubuntu-focal_amd64.deb
                wget  https://download.docker.com/linux/ubuntu/dists/focal/pool/stable/amd64/docker-ce_20.10.6~3-0~ubuntu-focal_amd64.deb
@@ -20,10 +20,10 @@
 
      - name: install docker
        shell: |
-               sudo dpkg -i /home/tf/download/docker/containerd.io_1.4.4-1_amd64.deb
-               sudo dpkg -i /home/tf/download/docker/docker-ce-cli_20.10.6~3-0~ubuntu-focal_amd64.deb
-               sudo dpkg -i /home/tf/download/docker/docker-ce_20.10.6~3-0~ubuntu-focal_amd64.deb
-               sudo dpkg -i /home/tf/download/docker/docker-compose-plugin_2.3.3~ubuntu-focal_amd64.deb
+               sudo dpkg -i /home/ubuntu/download/docker/containerd.io_1.4.4-1_amd64.deb
+               sudo dpkg -i /home/ubuntu/download/docker/docker-ce-cli_20.10.6~3-0~ubuntu-focal_amd64.deb
+               sudo dpkg -i /home/ubuntu/download/docker/docker-ce_20.10.6~3-0~ubuntu-focal_amd64.deb
+               sudo dpkg -i /home/ubuntu/download/docker/docker-compose-plugin_2.3.3~ubuntu-focal_amd64.deb
 
      - name: Set system configurations for Kubernetes networking
        file:

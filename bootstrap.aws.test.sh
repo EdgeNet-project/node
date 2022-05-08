@@ -23,7 +23,7 @@ EDGENET_ASK_CONFIRMATION="${EDGENET_ASK_CONFIRMATION:-1}"
 
 # Name of the playbook to run.
 # EDGENET_PLAYBOOK="${EDGENET_PLAYBOOK:-edgenet-node.yml}"
-EDGENET_PLAYBOOK="${EDGENET_PLAYBOOK:-edgenet-local-cluster.yml}"
+EDGENET_PLAYBOOK="${EDGENET_PLAYBOOK:-edgenet-aws-test.yml}"
 
 # Which branch of the node repository to use.
 EDGENET_REF="${EDGENET_REF:-local.cluster}"
@@ -110,10 +110,11 @@ esac
 # Run the node playbook.
 # hosts file contents: 
 # [masters]
-# kub0 ansible_host=192.168.56.3 ansible_connection=ssh ansible_user=<user> ansible_ssh_pass=<passwd>
+# [masters]
+# kub0 ansible_host=174.129.149.206 ansible_connection=ssh ansible_user=ubuntu
 # [workers]
-# kub1 ansible_host=192.168.56.4 ansible_connection=ssh ansible_user=<user> ansible_ssh_pass=<passwd>
-# kub2 ansible_host=192.168.56.5 ansible_connection=ssh ansible_user=<user> ansible_ssh_pass=<passwd>
+# kub1 ansible_host=3.82.242.101 ansible_connection=ssh ansible_user=ubuntu
+# kub1 ansible_host=3.82.242.101 ansible_connection=ssh ansible_user=ubuntu
 
 ansible-pull --accept-host-key --extra-vars "ansible_python_interpreter=${PYTHON}" --inventory "${HOST_FILE}", \
   --checkout "${EDGENET_REF}" --url "${EDGENET_REPOSITORY}" "${EDGENET_PLAYBOOK}"

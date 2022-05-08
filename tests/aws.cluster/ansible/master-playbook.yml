@@ -1,5 +1,5 @@
 - hosts: masters
-  # remote_user: tf
+  # remote_user: ubuntu
   become: yes
   # become_method: sudo
   # become_user: root
@@ -8,7 +8,7 @@
 
   tasks:
     - name: initialize the cluster
-      shell: kubeadm init --pod-network-cidr=10.244.0.0/16
+      shell: kubeadm init --pod-network-cidr=10.142.0.0/16
       args:
         chdir: $HOME
         creates: cluster_initialized.txt
