@@ -1,6 +1,6 @@
 - hosts: workers
   become: yes
-  gather_facts: yes
+  gather_facts: no
 
   tasks:
    - name: Copy join command from Ansiblehost to the worker nodes.

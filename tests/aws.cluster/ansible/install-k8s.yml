@@ -4,7 +4,7 @@
   become: yes
   become_method: sudo
   become_user: root
-  gather_facts: yes
+  gather_facts: no
   connection: ssh
 
   tasks:

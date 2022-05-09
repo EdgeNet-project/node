@@ -1,5 +1,6 @@
 - hosts: "masters, workers"
   become: yes
+  gather_facts: no
 
   tasks:
     - name: create the kube user account
@@ -14,4 +15,4 @@
     - name: set up authorized keys for the kube user
       authorized_key: user=kube key="{{item}}"
       with_file:
-        - ~/.ssh/edgenet-test-key-1.pub
+        - ~/.ssh/aws-edgenet-test.pub

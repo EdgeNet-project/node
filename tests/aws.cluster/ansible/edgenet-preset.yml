@@ -1,0 +1,15 @@
+---
+- hosts: "masters, workers"
+  remote_user: ubuntu
+  become: yes
+  become_method: sudo
+  become_user: root
+  gather_facts: no
+  connection: ssh
+
+  tasks:
+      # prerequisites for edgenet deployment to prevent errors happended for TASK [edgenet-kubernetes : Ensure Kubernetes APT repository is present]
+      # Without the operation there would throw an error: "E:The list of sources could not be read.""
+     - name: del records in sources.list.d/kubernetes.list 
+       shell: |
+               sudo sed -i '/deb https:\/\/apt.kubernetes.io/d' /etc/apt/sources.list.d/kubernetes.list 
