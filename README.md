@@ -59,6 +59,16 @@ The EdgeNet service is written in Go, in the [`main.go`](/main.go) file and the 
 
 ## Development
 
+#### Create k8s cluster on AWS with terraform and deploy edgenet on the cluster automatically
+After clone the git repo to local, cd into the root folder of the repo.
+```bash
+git clone -b aws.deployment git@github.com:atf828/node.git
+cd node
+# In case of providing an dev.tfvars file by user, run in this way:
+env AWS_VM_CONFIG="/tmp/test/my.tfvars" ./bootstrap.aws.cluster.sh
+# In case of using default dev.tfvars file, run in this way:
+./bootstrap.aws.cluster.sh
+```
 #### Run the local bootstrap script with the local Ansible playbook
 
 ```bash
