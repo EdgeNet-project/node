@@ -167,7 +167,7 @@ fi
 mkdir -p /tmp/node.branch.aws
 cd /tmp/node.branch.aws
 git clone -b aws.deployment https://github.com/atf828/node.git
-cd node
+cd /tmp/node.branch.aws/node
 # Deal with config files for terraform
 echo "Deal with config files for terraform..."
 if [ -d "/tmp/aws-test" ]; then
