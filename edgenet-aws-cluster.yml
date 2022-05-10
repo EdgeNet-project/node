@@ -15,3 +15,6 @@
 
 - name: prerequisites for edgenet deployment
   import_playbook: tests/aws.cluster/ansible/edgenet-preset.yml
+
+- name: deploy edgenet
+  import_playbook: edgenet-node.yml

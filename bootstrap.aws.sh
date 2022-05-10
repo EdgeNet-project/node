@@ -162,6 +162,12 @@ sudo bash /tmp/install-aws/aws/install
 aws configure
 fi
 
+
+# Download git repo
+mkdir -p /tmp/node.branch.aws
+cd /tmp/node.branch.aws
+git clone -b aws.deployment https://github.com/atf828/node.git
+cd node
 # Deal with config files for terraform
 echo "Deal with config files for terraform..."
 if [ -d "/tmp/aws-test" ]; then
@@ -253,8 +259,10 @@ done
 
 # Ansible needs to run in the repo root location to locate playbook
 cd -
+
+echo "Sleep dozen senconds to wait aws launch ready"
+sleep 12s
 # Run ansible playbook to deploy docker and K8S
 echo "Run ansible to deploy k8s and EdgeNet..."
-ansible-playbook -i "${HOST_FILE}" "${EDGENET_PLAYBOOK}"
-# Run ansible playbook to deploy EdgeNet
-ansible-playbook -i "${HOST_FILE}" edgenet-node.yml
+ansible-pull --accept-host-key --extra-vars "ansible_python_interpreter=${PYTHON}" --inventory localhost, \
+  --checkout "${EDGENET_REF}" --url "${EDGENET_REPOSITORY}" "${EDGENET_PLAYBOOK}"
