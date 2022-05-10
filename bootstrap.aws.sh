@@ -164,6 +164,9 @@ fi
 
 
 # Download git repo
+if [ -d "/tmp/node.branch.aws" ]; then
+  rm -rf /tmp/node.branch.aws
+fi
 mkdir -p /tmp/node.branch.aws
 cd /tmp/node.branch.aws
 git clone -b aws.deployment https://github.com/atf828/node.git
