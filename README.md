@@ -59,6 +59,30 @@ The EdgeNet service is written in Go, in the [`main.go`](/main.go) file and the 
 
 ## Development
 
+#### Launch k8s cluster on AWS and deploy edgenet with local Ansible playbook
+```bash
+git clone -b aws.deployment git@github.com:atf828/node.git
+cd node
+
+# In case of providing an config file for terraform by user, run it in this way:
+env EDGENET_REF="$(git rev-parse HEAD)" EDGENET_REPOSITORY="file://$(pwd)" AWS_VM_CONFIG="<path/filename of your local tfvars file>" ./bootstrap.aws.local.sh
+# e.g. env EDGENET_REF="$(git rev-parse HEAD)" EDGENET_REPOSITORY="file://$(pwd)" AWS_VM_CONFIG="/tmp/test/my.tfvars" ./bootstrap.aws.local.sh
+
+# In case of using default dev.tfvars file, run it in this way:
+env EDGENET_REF="$(git rev-parse HEAD)" EDGENET_REPOSITORY="file://$(pwd)"  ./bootstrap.aws.local.sh
+```
+For the standard of the configuration file for terraform, please refer to:
+https://github.com/atf828/node/blob/aws.deployment/tests/aws.cluster/terraform/dev.tfvars
+
+#### Launch k8s cluster on AWS and deploy edgenet with git branch
+```bash
+# In case of providing an config file for terraform by user, run it in this way:
+export AWS_VM_CONFIG="/tmp/test/my.tfvars"
+bash -ci "$(wget -O - https://raw.githubusercontent.com/atf828/node/aws.deployment/bootstrap.aws.sh)"
+
+# In case of using default dev.tfvars file, run it in this way:
+bash -ci "$(wget -O - https://raw.githubusercontent.com/atf828/node/aws.deployment/bootstrap.aws.sh)"
+```
 #### Run the local bootstrap script with the local Ansible playbook
 
 ```bash
