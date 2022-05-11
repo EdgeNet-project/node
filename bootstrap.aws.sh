@@ -23,7 +23,7 @@ EDGENET_ASK_CONFIRMATION="${EDGENET_ASK_CONFIRMATION:-1}"
 
 # Name of the playbook to run.
 # EDGENET_PLAYBOOK="${EDGENET_PLAYBOOK:-edgenet-node.yml}"
-EDGENET_PLAYBOOK="${EDGENET_PLAYBOOK:-edgenet-aws-cluster.yml}"
+EDGENET_PLAYBOOK="${EDGENET_PLAYBOOK:-edgenet-aws.yml}"
 
 # Which branch of the node repository to use.
 EDGENET_REF="${EDGENET_REF:-aws.deployment}"
@@ -263,9 +263,9 @@ done
 # Ansible needs to run in the repo root location to locate playbook
 cd -
 
-echo "Sleep dozen senconds to wait aws launch ready"
-sleep 12s
+echo "Sleep 30 senconds to wait aws launch ready"
+sleep 30s
 # Run ansible playbook to deploy docker and K8S
 echo "Run ansible to deploy k8s and EdgeNet..."
-ansible-pull --accept-host-key --extra-vars "ansible_python_interpreter=${PYTHON}" --inventory localhost, \
-  --checkout "${EDGENET_REF}" --url "${EDGENET_REPOSITORY}" "${EDGENET_PLAYBOOK}"
+
+ansible-playbook -i "${HOST_FILE}" "${EDGENET_PLAYBOOK}"
