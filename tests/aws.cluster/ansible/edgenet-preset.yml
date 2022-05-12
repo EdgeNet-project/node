@@ -1,5 +1,5 @@
 ---
-- hosts: "masters, workers"
+- hosts: workers
   remote_user: ubuntu
   become: yes
   become_method: sudo
