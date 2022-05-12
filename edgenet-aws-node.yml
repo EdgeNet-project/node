@@ -1,0 +1,9 @@
+# For the testing aws cluster, only workers should join the EdgeNet deployed on masters.
+---
+- hosts: workers
+  become: true
+  roles:
+    - edgenet-ssh
+    - edgenet-kubernetes
+  vars_files:
+    - vars/edgenet-production.yml

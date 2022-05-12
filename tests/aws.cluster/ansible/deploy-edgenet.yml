@@ -1,0 +1,20 @@
+---
+- hosts: masters
+  remote_user: ubuntu
+  become: yes
+  become_method: sudo
+  become_user: root
+  gather_facts: no
+  connection: ssh
+
+  tasks:
+
+     - name: deploy the EdgeNet software
+       shell: |
+               kubectl apply -f https://raw.githubusercontent.com/EdgeNet-project/edgenet/main/build/yamls/kubernetes.yaml
+
+     - name: check if the EdgeNet software entities are up and running
+       shell: |
+               sleep 30s
+               kubectl get pod -n edgenet
+               
