@@ -6,4 +6,4 @@
     - edgenet-ssh
     - edgenet-kubernetes
   vars_files:
-    - vars/edgenet-production.yml
+    - vars/edgenet-aws.yml

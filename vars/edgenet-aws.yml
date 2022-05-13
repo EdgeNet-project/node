@@ -1,0 +1,7 @@
+# edgenet-kubernetes
+containerd_version: 1.4
+kubernetes_version: 1.21
+edgenet_node_version: 1.0.13
+kubeconfig_url: $HOME/home/tf/.kube # in my control -plane, but we are goingto run it at worker node. So send it to worker node from control-plane.
+# edgenet-ssh
+edgenet_ssh_public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDrUR5G2Vnl7UChb6sCbGCzPAlRcVJROPGrkWNKUVeECKoVNpLc7sAQBitHZ5an+KRBdq9A819WYd+fH9yWl0/7bWRsDeq7DfrkzYEjG7YCq1jzWURgO9XR6ilKQoYibw+OsZSBEUUIcfAXhiLHF/Dd4vUZhpANKptAce7uUR0QZK53lH9AL2GU/85FPUCKMc8bH6EVKQSq+tSx+3KaHVsHVzmxwShkvCy5ySeD3203KAMzASK1QAuqRFG6MUQB0VfMnX2r2lKIqeJiGR1+/fzvvzBlM6aSSXMFn6RMVlHewmEaFjYWMx0RgUGchZBUnn+uYgmoP3H4ilpflzdNtL/5BYEqnUMQsRo+aW56xB9lQ6bV6en0jxp7+f1tb1ErAuxbvoAEpFrBe7b4MX/SDcuIQk91YtJKf0wtFkikdk+5JxF/qTo7Ot8YcY8NGaBHDVa3BSFQDfXZxuTUxBvoYkBdWA+dQvESWqh3QotUQ2GIzkff5FLYNuCunGTknCXGW0Z7dKAgX/fHBKLV7Zjrhs3CgdJJdjB2oHJdUj3ThCpUh0kJ11k9/6xe6/DVHldJwRYk9iRDmkskgvt6Ml/TkBeIjwZPL5JNxiCpyTzfscehP1OvZbgXiUMgzDqy1y5oOkWfxQ7FAzCPFttRnDVby5BTimnRbiyUhNmFI0VeaHAV7w== tf@kub0  # send it to worker node
