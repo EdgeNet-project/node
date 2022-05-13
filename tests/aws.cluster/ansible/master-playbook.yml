@@ -1,18 +1,16 @@
 - hosts: masters
   become: yes
-  # become_method: sudo
-  # become_user: root
-  gather_facts: no
-  # connection: ssh
 
   tasks:
-    - name: initialize the cluster
-      shell: kubeadm init --pod-network-cidr=10.142.0.0/16
-      args:
-        chdir: $HOME
-        creates: cluster_initialized.txt
+    # - name: initialize the cluster
+    #   shell: kubeadm init --pod-network-cidr=10.142.0.0/16
+    #   args:
+    #     chdir: $HOME
+    #     creates: cluster_initialized.txt
 
     - name: create .kube directory
+      become: yes
+      become_user: ubuntu
       file:
         path: $HOME/.kube
         state: directory
@@ -22,16 +20,20 @@
       become: yes
       copy:
         src: /etc/kubernetes/admin.conf
-        dest: $HOME/.kube/config
+        dest: /home/ubuntu/.kube/config
         remote_src: yes
-        owner: ubuntu
+        owner: tf
 
     - name: install Pod network
+      become: yes
+      become_user: ubuntu
       shell: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml 
       args:
         chdir: $HOME
  
     - name: Get the token for joining the worker nodes
+      become: yes
+      become_user: ubuntu
       shell: kubeadm token create  --kubeconfig=$HOME/.kube/config --print-join-command
       register: kubernetes_join_command
       args:
