@@ -1,5 +1,4 @@
 - hosts: masters
-  # remote_user: ubuntu
   become: yes
   # become_method: sudo
   # become_user: root
@@ -25,7 +24,7 @@
         src: /etc/kubernetes/admin.conf
         dest: $HOME/.kube/config
         remote_src: yes
-        owner: tf
+        owner: ubuntu
 
     - name: install Pod network
       shell: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml 
@@ -37,38 +36,6 @@
       register: kubernetes_join_command
       args:
         chdir: $HOME
-
-    # - name: create .kube directory
-    #   become: yes
-    #   become_user: kube
-    #   file:
-    #     path: $HOME/.kube
-    #     state: directory
-    #     mode: 0755
-
-    # - name: copies admin.conf to user's kube config
-    #   copy:
-    #     src: /etc/kubernetes/admin.conf
-    #     dest: /home/kube/.kube/config
-    #     remote_src: yes
-    #     owner: kube
-
-
-    # - name: install Pod network
-    #   become: yes
-    #   become_user: kube
-    #   shell: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml 
-    #   args:
-    #     chdir: $HOME
-        
-    # - name: Get the token for joining the worker nodes
-    #   become: yes
-    #   become_user: kube
-    #   shell: kubeadm token create  --kubeconfig=/home/kube/.kube/config --print-join-command
-    #   register: kubernetes_join_command
-    #   args:
-    #     chdir: $HOME
-
 
     - name: Copy join command to local file.
       become: yes
