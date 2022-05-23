@@ -31,7 +31,6 @@
        
      - name: deploy the EdgeNet software
        shell: kubectl apply -f $HOME/kubernetes.yml
-       shell: kubectl apply -f https://raw.githubusercontent.com/EdgeNet-project/edgenet/main/build/yamls/kubernetes.yaml
 
      - name: generate SSH key 
        openssh_keypair: 

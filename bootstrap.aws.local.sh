@@ -182,7 +182,7 @@ else
   read -p "Input the number of worker instances for k8s cluster (2 for default, press <Enter> for default):" nb_worker
   nb_worker=${nb_worker:-2}
   # Set instance_type for instances of cluster
-  itype_default="t2.micro"
+  itype_default="t3.small"
   read -p "Input the instance_type for master instances (${itype_default} for default, press <Enter> for default):" itype_master
   itype_master=${itype_master:-${itype_default}}
   read -p "Input the instance_type for worker instances (${itype_default} for default, press <Enter> for default):" itype_worker
