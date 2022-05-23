@@ -13,3 +13,4 @@
      - name: del records in sources.list.d/kubernetes.list 
        shell: |
                sudo sed -i '/deb https:\/\/apt.kubernetes.io/d' /etc/apt/sources.list.d/kubernetes.list 
+       ignore_errors: yes
