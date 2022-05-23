@@ -1,18 +1,17 @@
 ---
 - hosts: all
 
-
 - name: install dockers and k8s on all machines
-  import_playbook: tests/aws.cluster/ansible/install-k8s.yml
+  import_playbook: tests/aws.cluster/ansible/install-docker-k8s.yml
 
 - name: initialize master 
-  import_playbook: tests/aws.cluster/ansible/master-playbook.yml
+  import_playbook: tests/aws.cluster/ansible/master-init-k8s.yml
 
 - name: deploy the EdgeNet software to the k8s cluster
-  import_playbook: tests/aws.cluster/ansible/deploy-edgenet.yml
+  import_playbook: tests/aws.cluster/ansible/master-deploy-edgenet.yml
 
 - name: prerequisites for edgenet worker node deployment
-  import_playbook: tests/aws.cluster/ansible/edgenet-preset.yml
+  import_playbook: tests/aws.cluster/ansible/worker-preset-edgenet.yml
 
 - name: deploy edgenet worker node
   import_playbook: edgenet-aws-node.yml

@@ -153,14 +153,13 @@ fi
 if is_not_installed aws; then
 echo "Installing AWS CLI..."
 mkdir -p /tmp/install-aws
-# cd /tmp/install-aws
 curl -o /tmp/install-aws/awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
 unzip -d /tmp/install-aws/ /tmp/install-aws/awscliv2.zip
 sudo bash /tmp/install-aws/aws/install
-# sudo ./aws/install
 # Configure for AWS CLI, need input from user end
 aws configure
 fi
+
 
 # Deal with config files for terraform
 echo "Deal with config files for terraform..."
@@ -178,29 +177,27 @@ if [ "${AWS_VM_CONFIG}" != "/tmp/aws-test/dev.tfvars" ]; then
 else
   # If no config file supplied by user, use the default one, and set the parameters defined by user
   # Set number of instances for cluster
-  read -p "Input the number of master instances for k8s cluster (1 for default):" nb_master
+  read -p "Input the number of master instances for k8s cluster (1 for default, press <Enter> for default):" nb_master
   nb_master=${nb_master:-1}
-  read -p "Input the number of worker instances for k8s cluster (2 for default):" nb_worker
+  read -p "Input the number of worker instances for k8s cluster (2 for default, press <Enter> for default):" nb_worker
   nb_worker=${nb_worker:-2}
   # Set instance_type for instances of cluster
-  read -p "Input the instance_type for master instances (t2.micro for default):" itype_master
-  itype_master=${itype_master:-t2.micro}
-  read -p "Input the instance_type for worker instances (t2.micro for default):" itype_worker
-  itype_worker=${itype_worker:-t2.micro}
+  itype_default="t2.micro"
+  read -p "Input the instance_type for master instances (${itype_default} for default, press <Enter> for default):" itype_master
+  itype_master=${itype_master:-${itype_default}}
+  read -p "Input the instance_type for worker instances (${itype_default} for default, press <Enter> for default):" itype_worker
+  itype_worker=${itype_worker:-${itype_default}}
+
   # For the default config file, do following:
   # Set number of instances and instance_type defined by user
   old_nb_master="\"no_of_instances\" : \"1\""
   new_nb_master="\"no_of_instances\" : \"${nb_master}\""
-  # sed -zi "s/${old_nb_master}/${new_nb_master}/1" dev.tfvars
   old_nb_worker="\"no_of_instances\" : \"2\""
   new_nb_worker="\"no_of_instances\" : \"${nb_worker}\""
-  # sed -zi "s/${old_nb_worker}/${new_nb_worker}/1" dev.tfvars
-  old_itype_master="\"instance_type\" : \"t2.micro\","
+  old_itype_master="\"instance_type\" : \"${itype_default}\","
   new_itype_master="\"instance_type\" : \"${itype_master}\","
-  # sed -zi "s/${old_itype_master}/${new_itype_master}/1" dev.tfvars
-  old_itype_worker="\"instance_type\" : \"t2.micro\","
+  old_itype_worker="\"instance_type\" : \"${itype_default}\","
   new_itype_worker="\"instance_type\" : \"${itype_worker}\","
-  # sed -zi "s/${old_itype_worker}/${new_itype_worker}/1" dev.tfvars
 
   sed -i "8s/.*/${new_nb_master}/" /tmp/aws-test/dev.tfvars
   sed -i "14s/.*/${new_nb_worker}/" /tmp/aws-test/dev.tfvars
@@ -210,15 +207,15 @@ fi
 
 # Generate ssh key pair to configure aws cluster
 echo "Generate an ssh key pair..."
-ssh-keygen -t rsa -b 4096 -f $HOME/.ssh/aws-edgenet-test
+ssh-keygen -q -t rsa -N '' -f $HOME/.ssh/aws-edgenet-test <<<y >/dev/null 2>&1
 # Set public key in dev.tfvars
 pubkey=$(awk NF $HOME/.ssh/aws-edgenet-test.pub)
 # Write into the file supplied by user, or the default one
 echo -e "\n public_key = \"${pubkey}\"" >> /tmp/aws-test/dev.tfvars
-# echo -e "\n public_key = \"${pubkey}\"" >> "${AWS_VM_CONFIG}"
 
 echo "Create AWS clusters with terraform..."
 # Terraform need to run in folder where locates the tf file
+node_dir=$(pwd)
 cd /tmp/aws-test
 terraform fmt
 terraform init
@@ -252,11 +249,31 @@ for i in "${!ips[@]}"; do
 done
 
 # Ansible needs to run in the repo root location to locate playbook
-cd -
-
+cd ${node_dir}
 echo "Sleep 30 senconds to wait aws launch ready"
 sleep 30s
+
+
 # Run ansible playbook to deploy docker and K8S
 echo "Run ansible to deploy k8s and EdgeNet..."
 
 ansible-playbook -i "${HOST_FILE}" "${EDGENET_PLAYBOOK}"
+
+# Update vars/kubenetes.aws.yml with info from master nodes
+echo "Update kubenetes.aws.yml file..."
+if ! [ -f /tmp/aws-test/config ]; then
+  echo "Error: do not find /tmp/aws-test/config file."
+  exit 1
+fi
+
+master_ip=$(grep "server: " /tmp/aws-test/config | awk -F ':|//' '{print $4}')
+server_addr=$(echo "kubeconfig_url: http://${master_ip}:8082/config" | sed 's/\//\\\//g')
+edgenet_public_key=$(cat /tmp/aws-test/id_rsa.pub | sed 's/\//\\\//g')
+
+sed -i "s/kubeconfig_url.*/${server_addr}/1" vars/edgenet-aws.yml
+sed -i "s/edgenet_ssh_public_key.*/edgenet_ssh_public_key: ${edgenet_public_key}/1" vars/edgenet-aws.yml
+
+
+# Deploy worker node
+echo "Run ansible to deploy EdgeNet on worker nodes..."
+ansible-playbook -i "${HOST_FILE}" edgenet-aws-node.yml

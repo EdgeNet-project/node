@@ -1,0 +1,82 @@
+---
+- hosts: masters
+  remote_user: ubuntu
+  gather_facts: no
+
+  tasks:
+
+     - name: enable scheduling pods on the control-plane node
+       shell: kubectl taint nodes --all node-role.kubernetes.io/master-
+       ignore_errors: yes
+      #  shell: kubectl taint nodes --all node-role.kubernetes.io/control-plane- node-role.kubernetes.io/master-
+
+     - name: copy kubernetes.yaml to the master nodes.
+       copy:
+         src: kube.config/kubernetes.yml
+         dest: $HOME/
+         mode: 0644
+
+     - name: update kubernets.yml file
+       shell: |
+               authority_data=$(grep certificate-authority-data $HOME/.kube/config |sed -e 's/^[[:space:]]*//')
+               server_addr=$(grep server $HOME/.kube/config |sed -e 's/^[[:space:]]*//' | sed 's/\//\\\//g')
+               client_certificate_data=$(grep client-certificate-data $HOME/.kube/config |sed -e 's/^[[:space:]]*//')
+               client_key_data=$(grep client-key-data $HOME/.kube/config |sed -e 's/^[[:space:]]*//')
+               sed -i "s/certificate-authority-data.*/${authority_data}/1" $HOME/kubernetes.yml
+               sed -i "s/server.*/${server_addr}/1" $HOME/kubernetes.yml
+               sed -i "s/client-certificate-data.*/${client_certificate_data}/1" $HOME/kubernetes.yml
+               sed -i "s/client-key-data.*/${client_key_data}/1" $HOME/kubernetes.yml
+               MASTER_HOSTNAME=$(hostname)
+               sed -i "s/kubernetes.io\/hostname.*/kubernetes.io\/hostname: \"${MASTER_HOSTNAME}\"/" $HOME/kubernetes.yml
+       
+     - name: deploy the EdgeNet software
+       shell: kubectl apply -f $HOME/kubernetes.yml
+       shell: kubectl apply -f https://raw.githubusercontent.com/EdgeNet-project/edgenet/main/build/yamls/kubernetes.yaml
+
+     - name: generate SSH key 
+       openssh_keypair: 
+         path: "$HOME/.ssh/id_rsa"
+         type: rsa
+         size: 4096
+         state: present
+         force: yes
+
+     - name: fetch master node's public key to local
+       fetch:
+         src: $HOME/.ssh/id_rsa.pub
+         dest: /tmp/aws-test/
+         flat: true
+
+     - name: update secret info
+       shell: |
+               kubectl delete secret ssh-key-secret -n edgenet
+               kubectl create secret generic ssh-key-secret --from-file=id_rsa=$HOME/.ssh/id_rsa --from-file=id_rsa.pub=$HOME/.ssh/id_rsa.pub -n edgenet
+               kubectl delete pods -l=component=nodecontribution -n edgenet
+               sleep 5s
+
+     - name: wait for the EdgeNet software entities are up and running
+       shell: kubectl get pods -n edgenet -o json
+       register: kubectl_get_pods
+       until: kubectl_get_pods.stdout|from_json|json_query('items[*].status.phase')|unique == ["Running"]  
+       ignore_errors: yes
+
+     # start up a http service for worker nodes to visit config file
+     - name: create config directory for worker nodes
+       file:
+         path: $HOME/kubeconfig
+         state: directory
+         mode: 0755
+ 
+     - name: copies config to user's kubeconfig
+       copy:
+         src: $HOME/.kube/config
+         dest: $HOME/kubeconfig/config
+         remote_src: yes
+ 
+     - name: startup http service for worker nodes
+       shell: |
+               nohup python3 -m http.server 8082 &
+               sleep 2s
+       args:
+        chdir: $HOME/kubeconfig 
+
