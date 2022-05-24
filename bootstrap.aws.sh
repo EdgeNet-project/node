@@ -179,6 +179,7 @@ fi
 mkdir /tmp/aws-test
 cp tests/aws.cluster/terraform/* /tmp/aws-test/
 
+# TODO: prevent users input 0 workers
 # Set configure of aws instances to be created
 # If config file is supplied by user, use it
 if [ "${AWS_VM_CONFIG}" != "/tmp/aws-test/dev.tfvars" ]; then
