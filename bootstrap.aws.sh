@@ -218,6 +218,7 @@ cd ${DIR_NODE}
 echo "Deal with config files for terraform..."
 cp tests/aws.cluster/terraform/* ${DIR_TERRAFORM}
 
+# TODO: prevent users input 0 workers
 # Set configure of aws instances to be created
 # If config file is supplied by user, use it
 if [ "${AWS_VM_CONFIG}" != "${DIR_TERRAFORM}/dev.tfvars" ]; then

@@ -58,8 +58,10 @@
        register: kubectl_get_pods
        until: kubectl_get_pods.stdout|from_json|json_query('items[*].status.phase')|unique == ["Running"]  
        ignore_errors: yes
+       # TODO: why we need to ignore the errors, what we should do in future.
 
      # start up a http service for worker nodes to visit config file
+     # TODO: create a service account in cluster, allows worker execute the bootstrap safely.
      - name: create config directory for worker nodes
        file:
          path: $HOME/kubeconfig
