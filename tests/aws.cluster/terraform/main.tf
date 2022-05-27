@@ -67,9 +67,15 @@ resource "aws_security_group" "edgenet-test-sg" {
 }
 
 resource "aws_key_pair" "edgenet-test-key" {
-  key_name   = "edgenet-test-key"
+  key_name   = "aws-edgenet-test"
   public_key = var.public_key
 }
+
+# resource "aws_key_pair" "edgenet-test-key" {
+#   key_name   = "edgenet-test-key"
+#   public_key = var.public_key
+# }
+
 
 locals {
   serverconfig = [
@@ -115,4 +121,33 @@ EOF
 output "instances" {
   value       = aws_instance.k8s
   description = "All Machine details"
+}
+
+output "aws_vpc" {
+  value       = aws_vpc.edgenet-test
+  description = "Vpc details"
+}
+
+output "aws_subnet" {
+  value       = aws_subnet.edgenet-test-subnet
+  description = "Subnet details"
+}
+output "aws_route_table" {
+  value       = aws_route_table.edgenet-test-rt
+  description = "Route table details"
+}
+
+output "aws_route_table_association" {
+  value       = aws_route_table_association.edgenet-test-rta
+  description = "Route table association details"
+}
+
+output "aws_security_group" {
+  value       = aws_security_group.edgenet-test-sg
+  description = "Security group details"
+}
+
+output "aws_key_pair" {
+  value       = aws_key_pair.edgenet-test-key
+  description = "Key pair  details"
 }

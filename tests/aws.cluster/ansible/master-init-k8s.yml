@@ -36,6 +36,18 @@
     - name: fetch master node's kube config to local
       fetch:
         src: /home/ubuntu/.kube/config
-        dest: /tmp/aws-test/
+        dest: /var/tmp/edgenet.aws.test/  
         flat: true
-        
+
+    # - name: Get the token for joining the worker nodes
+    #   become: yes
+    #   become_user: ubuntu
+    #   shell: kubeadm token create  --kubeconfig=$HOME/.kube/config --print-join-command
+    #   register: kubernetes_join_command
+    #   args:
+    #     chdir: $HOME
+
+    # - name: Copy join command to local file.
+    #   become: yes
+    #   local_action: copy content="{{ kubernetes_join_command.stdout_lines[0] }}" dest="/tmp/aws-test/kubernetes_join_command" mode=0777
+
