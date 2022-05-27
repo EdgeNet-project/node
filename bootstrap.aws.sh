@@ -351,8 +351,8 @@ vpc_id=$(cat ${DIR_TERRAFORM}/aws_vpc.ret | grep "\"id\"" | cut -d'"' -f 4)
 association_id=$(cat ${DIR_TERRAFORM}/aws_route_table_association.ret | grep "\"id\"" | cut -d'"' -f 4)
 
 # Sleep for waiting instances to be terminated, or else delete subnet will be failed due to dependency problems
-echo "sleep 2mins waiting for instances to be terminated"
-sleep 120s
+echo "sleep 60s waiting for instances to be terminated"
+sleep 60s
 aws ec2 disassociate-route-table --association-id ${association_id}
 aws ec2 delete-key-pair --key-name ${key_id}
 aws ec2 delete-subnet --subnet-id ${subnet_id}
