@@ -84,6 +84,11 @@ env AWS_VM_CONFIG="<path/filename of your local tfvars file>" ./bootstrap.aws.lo
 For the standard of the config file for terraform, please refer to:
 https://github.com/atf828/node/blob/aws.deployment/tests/aws.cluster/terraform/dev.tfvars
 
+#### Delete AWS resources created by terraform
+To use the tool, make sure that the folder "/var/tmp/edgenet.aws.test/terraform.config/" created for terraform should be there without touch, as the tool will read these files to get AWS resources informations like instance_ids etc.
+```bash
+bash -ci "$(wget -O - https://raw.githubusercontent.com/atf828/node/aws.deployment/tests/aws.cluster/tools/delete.aws.resources.sh)"
+```
 #### Run the local bootstrap script with the local Ansible playbook
 
 ```bash
