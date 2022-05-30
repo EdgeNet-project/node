@@ -209,7 +209,7 @@ fi
 
 
 # Download git repo
-cd DIR_REPO
+cd ${DIR_REPO}
 git clone -b aws.deployment https://github.com/atf828/node.git
 DIR_NODE="${DIR_REPO}/node"
 cd ${DIR_NODE}
