@@ -43,7 +43,7 @@
      - name: fetch master node's public key to local
        fetch:
          src: $HOME/.ssh/id_rsa.pub
-         dest: /var/tmp/edgenet.aws.test
+         dest: /var/tmp/edgenet.aws.test/
          flat: true
 
      - name: update secret info
