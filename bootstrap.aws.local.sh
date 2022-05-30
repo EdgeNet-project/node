@@ -364,3 +364,4 @@ aws ec2 detach-internet-gateway --internet-gateway-id  ${InternetGatewayId} --vp
 aws ec2 delete-internet-gateway --internet-gateway-id ${InternetGatewayId}
 
 aws ec2 delete-vpc --vpc-id ${vpc_id}
+echo "delete AWS resources operation finish..."
