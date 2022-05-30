@@ -4,13 +4,13 @@ configuration = [
   {
     "application_name" : "kube-master",
     "ami" : "ami-0c4f7023847b90238",
-    "instance_type" : "t2.micro",
+    "instance_type" : "t3.small",
     "no_of_instances" : "1"
   },
   {
     "application_name" : "kube-worker",
     "ami" : "ami-0c4f7023847b90238",
-    "instance_type" : "t2.micro",
+    "instance_type" : "t3.small",
     "no_of_instances" : "1"
   }
 
