@@ -79,6 +79,7 @@ if is_not_installed ansible || is_not_installed git; then
   ubuntu-1*)
     export DEBIAN_FRONTEND=noninteractive
     ${SUDO} apt update --quiet
+    ${SUDO} apt install --quiet --yes --fix-broken
     ${SUDO} apt install --quiet --yes dirmngr software-properties-common
     ${SUDO} apt-add-repository --yes --update ppa:ansible/ansible
     ${SUDO} apt install --quiet --yes ansible git
@@ -87,6 +88,7 @@ if is_not_installed ansible || is_not_installed git; then
   ubuntu-2*)
     export DEBIAN_FRONTEND=noninteractive
     ${SUDO} apt update --quiet
+    ${SUDO} apt install --quiet --yes --fix-broken
     ${SUDO} apt install --quiet --yes ansible git
     ;;
 
