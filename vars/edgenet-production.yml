@@ -1,4 +1,4 @@
 # edgenet-kubernetes
 containerd_version: 1.4
-kubernetes_version: 1.21
+kubernetes_version: 1.22
 edgenet_node_version: 1.0.13
