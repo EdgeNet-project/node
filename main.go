@@ -103,20 +103,20 @@ func getHostnameRoot(platform string) string {
 	case platforms.GENI:
 		// TODO: From slice name?
 		geoIP := network.GeoIP()
-		return strings.ToLower(fmt.Sprintf("geni-%s-%s", geoIP.CountryCode, geoIP.RegionCode))
+		return strings.ToLower(fmt.Sprintf("geni-%s-%s", geoIP.CountryCode, geoIP.Region))
 	case platforms.GCP:
 		region := platforms.GCPGetMetadata("instance/zone")
 		region = strings.Split(region, "/")[3]
 		return fmt.Sprintf("gcp-%s", region)
 	case platforms.NUC:
 		geoIP := network.GeoIP()
-		return strings.ToLower(fmt.Sprintf("nuc-%s-%s", geoIP.CountryCode, geoIP.RegionCode))
+		return strings.ToLower(fmt.Sprintf("nuc-%s-%s", geoIP.CountryCode, geoIP.Region))
 	case platforms.SCW:
 		meta := platforms.SCWGetMetadata()
 		return fmt.Sprintf("scw-%s", meta.Location.ZoneID)
 	default:
 		geoIP := network.GeoIP()
-		return strings.ToLower(fmt.Sprintf("%s-%s", geoIP.CountryCode, geoIP.RegionCode))
+		return strings.ToLower(fmt.Sprintf("%s-%s", geoIP.CountryCode, geoIP.Region))
 	}
 }
 

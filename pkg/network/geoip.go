@@ -25,29 +25,37 @@ import (
 )
 
 type GeoIPResponse struct {
-	City        string  `json:"string"`
-	CountryCode string  `json:"country_code"`
-	CountryName string  `json:"country_name"`
-	IP          net.IP  `json:"ip"`
-	Latitude    float64 `json:"latitude"`
-	Longitude   float64 `json:"longitude"`
-	RegionCode  string  `json:"region_code"`
-	RegionName  string  `json:"region_name"`
-	Timezone    string  `json:"time_zone"`
+	Status      string  `json:"success"`
+	Country     string  `json:"country"`
+	CountryCode string  `json:"countryCode"`
+	Region      string  `json:"region"`
+	RegionName  string  `json:"regionName"`
+	City        string  `json:"city"`
+	Zip         string  `json:"zip"`
+	Lat         float64 `json:"lat"`
+	Lon         float64 `json:"lon"`
+	Timezone    string  `json:"timezone"`
+	ISP         string  `json:"isp"`
+	Org         string  `json:"org"`
+	As          string  `json:"as"`
+	Query       string  `json:"query"`
 }
 
 // GeoIP returns the geographical location of the requester IP address
 // using an external service.
 func GeoIP() GeoIPResponse {
 	// NOTE: this might return an IPv6 address if the host has IPv6 connectivity.
-	resp, err := http.Get("https://freegeoip.app/json/")
+	resp, err := http.Get("http://ip-api.com/json/")
 	check(err)
 	defer resp.Body.Close()
 	var geoIP GeoIPResponse
 	err = json.NewDecoder(resp.Body).Decode(&geoIP)
 	check(err)
-	if geoIP.RegionCode == "" {
-		geoIP.RegionCode = geoIP.CountryCode
+	if geoIP.CountryCode == "" {
+		geoIP.CountryCode = "na"
+	}
+	if geoIP.Region == "" {
+		geoIP.Region = geoIP.CountryCode
 	}
 	return geoIP
 }
