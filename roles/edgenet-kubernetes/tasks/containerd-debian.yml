@@ -10,6 +10,12 @@
     state: present
     update_cache: true
 
+- name: Ensure apparmor is installed
+  apt:
+    name: apparmor
+    state: present
+    update_cache: true
+
 - name: Ensure containerd APT GPG key is present
   apt_key:
     url: "{{ containerd_apt_gpg_key }}"
