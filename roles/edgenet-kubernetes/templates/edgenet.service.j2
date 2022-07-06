@@ -10,10 +10,13 @@ Before=kubelet.service
 [Service]
 ExecStart=/opt/edgenet/node
 RemainAfterExit=yes
-# NOTE: CentOS has an old systemd version which doesn't allow restarting oneshot services...
-# Restart=on-failure
-# RestartSec=10s
 Type=oneshot
+# CentOS has an old systemd version which doesn't allow restarting oneshot services...
+# (╯°□°)╯︵ ┻━┻
+{% if ansible_os_family != "RedHat" %}
+Restart=on-failure
+RestartSec=10s
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target

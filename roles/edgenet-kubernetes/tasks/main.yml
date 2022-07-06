@@ -108,7 +108,7 @@
   template:
     src: edgenet-config.yaml.j2
     dest: /opt/edgenet/config.yaml
-    mode: 0644
+    mode: "0644"
 
 - name: Ensure EdgeNet binary is present
   get_url:
@@ -120,8 +120,8 @@
     timeout: 120
 
 - name: Ensure EdgeNet service is present
-  copy:
-    src: edgenet.service
+  template:
+    src: edgenet.service.j2
     dest: /etc/systemd/system/edgenet.service
     mode: "0644"
 
