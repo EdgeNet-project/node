@@ -18,8 +18,8 @@
     mode: "0644"
   notify: restart containerd
 
-- name: Ensure containerd is started and enabled at boot
+- name: Ensure containerd enabled at boot (state={{ edgenet_service_state }})
   systemd:
     name: containerd
-    state: started
+    state: "{{ edgenet_service_state }}"
     enabled: true

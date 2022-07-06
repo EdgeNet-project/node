@@ -20,3 +20,5 @@
 - name: Ensure swap is disabled for the session
   tags: ['skip_ansible_lint']
   command: swapoff -a
+  # This may fail in some environment (e.g. Armbian Docker build).
+  ignore_errors: true

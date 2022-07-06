@@ -48,26 +48,6 @@
     create: true
     state: present
 
-- name: Ensure /etc/ssh/ssh_host_rsa_key is present
-  command : ssh-keygen -q -t rsa -f /etc/ssh/ssh_host_rsa_key -C "" -N ""
-  args:
-    creates: /etc/ssh/ssh_host_rsa_key
-
-- name: Ensure /etc/ssh/ssh_host_dsa_key is present
-  command : ssh-keygen -q -t dsa -f /etc/ssh/ssh_host_dsa_key -C "" -N ""
-  args:
-    creates: /etc/ssh/ssh_host_dsa_key
-
-- name: Ensure /etc/ssh/ssh_host_ecdsa_key is present
-  command : ssh-keygen -q -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key -C "" -N ""
-  args:
-    creates: /etc/ssh/ssh_host_ecdsa_key
-
-- name: Ensure /etc/ssh/ssh_host_ed25519_key is present
-  command : ssh-keygen -q -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -C "" -N ""
-  args:
-    creates: /etc/ssh/ssh_host_ed25519_key
-
 - name: "Ensure the SSH ports 22 and {{ edgenet_ssh_port_alt }} are allowed"
   lineinfile:
     path: /etc/ssh/sshd_config
@@ -83,3 +63,5 @@
     name: sshd
     state: started
     enabled: true
+  # This may fail in some environment (e.g. Armbian Docker build).
+  ignore_errors: true

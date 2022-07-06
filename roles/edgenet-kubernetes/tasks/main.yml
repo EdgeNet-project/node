@@ -53,6 +53,8 @@
     - ip_conntrack
     - ip_tables
     - overlay
+  # This may fail in some environment (e.g. Armbian Docker build).
+  ignore_errors: true
 
 # Firewalld seems to conflict with ipt/nf and drop incoming traffic on the VPN interface.
 - name: Ensure firewalld is disabled

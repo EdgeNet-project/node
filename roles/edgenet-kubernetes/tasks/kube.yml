@@ -5,8 +5,8 @@
 - include_tasks: kube-redhat.yml
   when: ansible_os_family == 'RedHat'
 
-- name: Ensure kubelet is started and enabled at boot
+- name: Ensure kubelet is enabled at boot (state={{ edgenet_service_state }})
   systemd:
     name: kubelet
-    state: started
+    state: "{{ edgenet_service_state }}"
     enabled: true

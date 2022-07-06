@@ -1,0 +1,12 @@
+---
+# Playbook used to build custom armbian images.
+- hosts: all
+  become: true
+  roles:
+    - edgenet-ssh
+    - edgenet-kubernetes
+  vars_files:
+    - vars/edgenet-at-home.yml
+  vars:
+    # Wait until first boot to run the service.
+    edgenet_service_state: stopped
