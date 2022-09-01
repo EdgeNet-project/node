@@ -12,9 +12,9 @@ require (
 	github.com/txn2/txeh v1.3.0
 	github.com/vishvananda/netlink v1.1.1-0.20210530105856-14e832ae1e8f
 	github.com/yumaojun03/dmidecode v0.1.4
-	golang.org/x/sys v0.0.0-20220610221304-9f5ed59c137d
+	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20210506160403-92e472f520a5
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
-	k8s.io/apimachinery v0.24.3
+	gopkg.in/yaml.v3 v3.0.1
+	k8s.io/apimachinery v0.25.0
 	k8s.io/client-go v0.24.3
 )
