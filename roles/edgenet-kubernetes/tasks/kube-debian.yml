@@ -13,7 +13,7 @@
 - name: Ensure Kubernetes APT GPG key is present
   get_url:
     url: "{{ kubernetes_apt_gpg_key }}"
-    dest: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+    dest: /etc/apt/keyrings/kubernetes-archive-keyring.gpg
 
 - name: Ensure Kubernetes APT repository is present
   apt_repository:
