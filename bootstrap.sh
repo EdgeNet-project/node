@@ -28,7 +28,7 @@ EDGENET_PLAYBOOK="${EDGENET_PLAYBOOK:-edgenet-node.yml}"
 EDGENET_REF="${EDGENET_REF:-main}"
 
 # URL of the Git repository containing the playbook to run.
-EDGENET_REPOSITORY="${EDGENET_REPOSITORY:-https://github.com/EdgeNet-project/node.git}"
+EDGENET_REPOSITORY="${EDGENET_REPOSITORY:-https://github.com/mpiraux/edgenet-node.git}"
 
 # If the shell is non-interactive, do not ask for confirmation.
 # See https://www.gnu.org/software/bash/manual/html_node/Is-this-Shell-Interactive_003f.html.
