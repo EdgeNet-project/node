@@ -11,7 +11,7 @@ containerd_apt_repository: "deb [arch={{ containerd_apt_arch }}] https://downloa
 containerd_apt_gpg_key: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
 
 kubernetes_apt_release_channel: main
-kubernetes_apt_repository: "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] http://apt.kubernetes.io/ kubernetes-xenial {{ kubernetes_apt_release_channel }}"
+kubernetes_apt_repository: "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.asc] http://apt.kubernetes.io/ kubernetes-xenial {{ kubernetes_apt_release_channel }}"
 kubernetes_apt_gpg_key: https://packages.cloud.google.com/apt/doc/apt-key.gpg
 
 # RedHat
